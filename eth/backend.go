@@ -180,6 +180,8 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	var (
 		vmConfig = vm.Config{
 			EnablePreimageRecording: config.EnablePreimageRecording,
+			Debug:                   true,
+			Tracer:                  vm.NewStructLogger(&vm.LogConfig{EnableMemory: true}),
 		}
 		cacheConfig = &core.CacheConfig{
 			TrieCleanLimit:      config.TrieCleanCache,
@@ -298,6 +300,11 @@ func (s *Ethereum) APIs() []rpc.API {
 		{
 			Namespace: "eth",
 			Service:   NewEthereumAPI(s),
+		}, {
+			Namespace: "eth",
+			Version:   "1.0",
+			Service:   NewPublicTraceAPI(s),
+			Public:    true,
 		}, {
 			Namespace: "miner",
 			Service:   NewMinerAPI(s),

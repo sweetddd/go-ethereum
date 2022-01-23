@@ -99,6 +99,7 @@ type environment struct {
 	txs      []*types.Transaction
 	receipts []*types.Receipt
 	uncles   map[common.Hash]*types.Header
+	executionResults []*types.ExecutionResult
 }
 
 // copy creates a deep copy of environment.
@@ -149,10 +150,11 @@ func (env *environment) discard() {
 
 // task contains all information for consensus engine sealing and result submitting.
 type task struct {
-	receipts  []*types.Receipt
-	state     *state.StateDB
-	block     *types.Block
-	createdAt time.Time
+	receipts         []*types.Receipt
+	executionResults []*types.ExecutionResult
+	state            *state.StateDB
+	block            *types.Block
+	createdAt        time.Time
 }
 
 const (
@@ -498,10 +500,10 @@ func (w *worker) newWorkLoop(recommit time.Duration) {
 			timestamp = time.Now().Unix()
 			commit(false, commitInterruptNewHead)
 
-		/*case head := <-w.chainHeadCh:
+		case head := <-w.chainHeadCh:
 			clearPending(head.Block.NumberU64())
 			timestamp = time.Now().Unix()
-			commit(false, commitInterruptNewHead)*/
+			// commit(false, commitInterruptNewHead)
 
 		case <-timer.C:
 			// If sealing is running resubmit a new work cycle periodically to pull in
@@ -572,6 +574,7 @@ func (w *worker) mainLoop() {
 		select {
 		case req := <-w.newWorkCh:
 			w.commitWork(req.interrupt, req.noempty, req.timestamp)
+			// new block created.
 
 		case req := <-w.getWorkCh:
 			block, fees, err := w.generateWork(req.params)
@@ -744,13 +747,18 @@ func (w *worker) resultLoop() {
 			}
 			// Different block could share same sealhash, deep copy here to prevent write-write conflict.
 			var (
-				receipts = make([]*types.Receipt, len(task.receipts))
-				logs     []*types.Log
+				receipts  = make([]*types.Receipt, len(task.receipts))
+				evmTraces = make([]*types.ExecutionResult, len(task.executionResults))
+				logs      []*types.Log
 			)
 			for i, taskReceipt := range task.receipts {
 				receipt := new(types.Receipt)
 				receipts[i] = receipt
 				*receipt = *taskReceipt
+
+				evmTrace := new(types.ExecutionResult)
+				evmTraces[i] = evmTrace
+				*evmTrace = *task.executionResults[i]
 
 				// add block location fields
 				receipt.BlockHash = hash
@@ -769,7 +777,7 @@ func (w *worker) resultLoop() {
 				logs = append(logs, receipt.Logs...)
 			}
 			// Commit block and state to database.
-			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, task.state, true)
+			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, &types.BlockResult{ExecutionResults: evmTraces},task.state, true)
 			if err != nil {
 				log.Error("Failed writing block to chain", "err", err)
 				continue
@@ -865,6 +873,10 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 		snap = env.state.Snapshot()
 		gp   = env.gasPool.Gas()
 	)
+	// reset tracer.
+	tracer := w.chain.GetVMConfig().Tracer.(*vm.StructLogger)
+	tracer.Reset()
+
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &env.coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, *w.chain.GetVMConfig())
 	if err != nil {
 		env.state.RevertToSnapshot(snap)
@@ -873,7 +885,12 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	}
 	env.txs = append(env.txs, tx)
 	env.receipts = append(env.receipts, receipt)
-
+	w.current.executionResults = append(w.current.executionResults, &types.ExecutionResult{
+		Gas:         receipt.GasUsed,
+		Failed:      receipt.Status == types.ReceiptStatusSuccessful,
+		ReturnValue: fmt.Sprintf("%x", receipt.ReturnValue),
+		StructLogs:  vm.FormatLogs(tracer.StructLogs()),
+	})
 	return receipt.Logs, nil
 }
 
@@ -1206,7 +1223,7 @@ func (w *worker) commit(env *environment, interval func(), update bool, start ti
 		// If we're post merge, just ignore
 		if !w.isTTDReached(block.Header()) {
 			select {
-			case w.taskCh <- &task{receipts: env.receipts, state: env.state, block: block, createdAt: time.Now()}:
+			case w.taskCh <- &task{receipts: env.receipts, executionResults: w.current.executionResults, state: env.state, block: block, createdAt: time.Now()}:
 				w.unconfirmed.Shift(block.NumberU64() - 1)
 
 				fees := totalFees(block, env.receipts)

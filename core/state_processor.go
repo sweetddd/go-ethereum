@@ -117,9 +117,14 @@ func applyTransaction(msg *Message, config *params.ChainConfig, gp *GasPool, sta
 	}
 	*usedGas += result.UsedGas
 
+	// If the result contains a revert reason, return it.
+	returnVal := result.Return()
+	if len(result.Revert()) > 0 {
+		returnVal = result.Revert()
+	}
 	// Create a new receipt for the transaction, storing the intermediate root and gas used
 	// by the tx.
-	receipt := &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: *usedGas}
+	receipt := &types.Receipt{Type: tx.Type(), PostState: root, CumulativeGasUsed: *usedGas, ReturnValue: returnVal}
 	if result.Failed() {
 		receipt.Status = types.ReceiptStatusFailed
 	} else {

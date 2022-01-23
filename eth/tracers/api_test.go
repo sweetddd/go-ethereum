@@ -228,6 +228,12 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
+			expect: &types.ExecutionResult{
+				Gas:         params.TxGas,
+				Failed:      false,
+				ReturnValue: "",
+				StructLogs:  []types.StructLogRes{},
+			},
 		},
 		// Standard JSON trace upon the head, plain transfer.
 		{
@@ -240,6 +246,12 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
+			expect: &types.ExecutionResult{
+				Gas:         params.TxGas,
+				Failed:      false,
+				ReturnValue: "",
+				StructLogs:  []types.StructLogRes{},
+			},
 		},
 		// Standard JSON trace upon the non-existent block, error expects
 		{
@@ -264,6 +276,12 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
+			expect: &types.ExecutionResult{
+				Gas:         params.TxGas,
+				Failed:      false,
+				ReturnValue: "",
+				StructLogs:  []types.StructLogRes{},
+			},
 		},
 		// Tracing on 'pending' should fail:
 		{
@@ -289,6 +307,12 @@ func TestTraceCall(t *testing.T) {
 			expect: ` {"gas":53018,"failed":false,"returnValue":"","structLogs":[
 		{"pc":0,"op":"NUMBER","gas":24946984,"gasCost":2,"depth":1,"stack":[]},
 		{"pc":1,"op":"STOP","gas":24946982,"gasCost":0,"depth":1,"stack":["0x1337"]}]}`,
+			expect: &types.ExecutionResult{
+				Gas:         params.TxGas,
+				Failed:      false,
+				ReturnValue: "",
+				StructLogs:  []types.StructLogRes{},
+			},
 		},
 	}
 	for i, testspec := range testSuite {

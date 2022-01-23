@@ -612,3 +612,18 @@ func (api *DebugAPI) SetTrieFlushInterval(interval string) error {
 	api.eth.blockchain.SetTrieFlushInterval(t)
 	return nil
 }
+
+// PublicTraceAPI provides an API to get evmTrace, mpt proof.
+type PublicTraceAPI struct {
+	e *Ethereum
+}
+
+// NewPublicTraceAPI creates a new Ethereum trace API.
+func NewPublicTraceAPI(eth *Ethereum) *PublicTraceAPI {
+	return &PublicTraceAPI{eth}
+}
+
+// BlockResultByHash returns the blockResult by blockHash.
+func (api *PublicTraceAPI) BlockResultByHash(blockHash common.Hash) (*types.BlockResult, error) {
+	return rawdb.ReadBlockResult(api.e.chainDb, blockHash), nil
+}

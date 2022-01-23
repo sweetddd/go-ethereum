@@ -161,6 +161,9 @@ const (
 	PendingTransactionsSubscription
 	// BlocksSubscription queries hashes for blocks that are imported
 	BlocksSubscription
+	// BlockResultsSubscription queries for block execution traces
+	BlockResultsSubscription
+	// LastSubscription keeps track of the last index
 	// LastIndexSubscription keeps track of the last index
 	LastIndexSubscription
 )
@@ -185,6 +188,7 @@ type subscription struct {
 	logs      chan []*types.Log
 	txs       chan []*types.Transaction
 	headers   chan *types.Header
+	blockResults chan *types.BlockResult
 	installed chan struct{} // closed when the filter is installed
 	err       chan error    // closed when the filter is uninstalled
 }
@@ -401,6 +405,19 @@ func (es *EventSystem) SubscribeNewHeads(headers chan *types.Header) *Subscripti
 	return es.subscribe(sub)
 }
 
+// SubscribeBlockResult creates a subscription that writes the block trace when a new block is created.
+func (es *EventSystem) SubscribeBlockResult(blockResult chan *types.BlockResult) *Subscription {
+	sub := &subscription{
+		id:           rpc.NewID(),
+		typ:          BlockResultsSubscription,
+		created:      time.Now(),
+		blockResults: blockResult,
+		installed:    make(chan struct{}),
+		err:          make(chan error),
+	}
+	return es.subscribe(sub)
+}
+
 // SubscribePendingTxs creates a subscription that writes transactions for
 // transactions that enter the transaction pool.
 func (es *EventSystem) SubscribePendingTxs(txs chan []*types.Transaction) *Subscription {
@@ -461,6 +478,9 @@ func (es *EventSystem) handleTxsEvent(filters filterIndex, ev core.NewTxsEvent) 
 func (es *EventSystem) handleChainEvent(filters filterIndex, ev core.ChainEvent) {
 	for _, f := range filters[BlocksSubscription] {
 		f.headers <- ev.Block.Header()
+	}
+	for _, f := range filters[BlockResultsSubscription] {
+		f.blockResults <- ev.BlockResult
 	}
 	if es.lightMode && len(filters[LogsSubscription]) > 0 {
 		es.lightFilterNewHead(ev.Block.Header(), func(header *types.Header, remove bool) {
