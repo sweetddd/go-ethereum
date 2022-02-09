@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/scroll-tech/go-ethereum/rlp"
+	"github.com/iswallet/go-ethereum/rlp"
 )
 
 // BlockResult contains block execution traces and results required for rollers.
