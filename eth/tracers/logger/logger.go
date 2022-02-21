@@ -74,6 +74,7 @@ type StructLog struct {
 	Storage       map[common.Hash]common.Hash `json:"-"`
 	Depth         int                         `json:"depth"`
 	RefundCounter uint64                      `json:"refund"`
+	ExtraData     *types.ExtraData            `json:"extraData"`
 	Err           error                       `json:"-"`
 }
 
@@ -177,7 +178,10 @@ func (l *StructLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, s
 	stackData := stack.Data()
 	stackLen := len(stackData)
 	// Copy a snapshot of the current storage to a new container
-	var storage Storage
+	var (
+		storage   Storage
+		extraData *types.ExtraData
+	)
 	if !l.cfg.DisableStorage && (op == vm.SLOAD || op == vm.SSTORE) {
 		// initialise new changed values storage container for this contract
 		// if not present.
@@ -200,6 +204,10 @@ func (l *StructLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, s
 			)
 			l.storage[contract.Address()][address] = value
 			storage = l.storage[contract.Address()].Copy()
+			extraData = types.NewExtraData()
+			if err := vm.traceStorageProof(l, scope, extraData); err != nil {
+				log.Warn("Failed to get proof", "contract address", contract.Address().String(), "key", address.String(), "err", err)
+			}
 		}
 	}
 	var rdata []byte
@@ -208,7 +216,30 @@ func (l *StructLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, s
 		copy(rdata, rData)
 	}
 	// create a new snapshot of the EVM.
-	log := StructLog{pc, op, gas, cost, mem, memory.Len(), stck, rdata, storage, depth, l.env.StateDB.GetRefund(), err}
+	log := StructLog{pc, op, gas, cost, mem, memory.Len(), stck, rdata, storage, depth, l.env.StateDB.GetRefund(), extraData, err}
+	l.logs = append(l.logs, log)
+}
+
+// CaptureStateAfter for special needs, tracks SSTORE ops and records the storage change.
+func (l *StructLogger) CaptureStateAfter(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+	// check if already accumulated the specified number of logs
+	if l.cfg.Limit != 0 && l.cfg.Limit <= len(l.logs) {
+		return
+	}
+
+	execFuncList, ok := vm.OpcodeExecs[op]
+	if !ok {
+		return
+	}
+	extraData := types.NewExtraData()
+	// execute trace func list.
+	for _, exec := range execFuncList {
+		if err = exec(l, scope, extraData); err != nil {
+			log.Error("Failed to trace data", "opcode", op.String(), "err", err)
+		}
+	}
+
+	log := StructLog{pc, op, gas, cost, nil, scope.Memory.Len(), nil, nil, nil, depth, l.env.StateDB.GetRefund(), extraData, err}
 	l.logs = append(l.logs, log)
 }
 
@@ -378,6 +409,10 @@ func (t *mdLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, scope
 	if err != nil {
 		fmt.Fprintf(t.out, "Error: %v\n", err)
 	}
+}
+
+// CaptureStateAfter for special needs, tracks SSTORE ops and records the storage change.
+func (t *mdLogger) CaptureStateAfter(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
 }
 
 func (t *mdLogger) CaptureFault(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, depth int, err error) {

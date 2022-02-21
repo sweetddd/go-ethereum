@@ -17,6 +17,8 @@
 package vm
 
 import (
+	"fmt"
+	"github.com/iswallet/go-ethereum/core/types"
 	"math/big"
 
 	"github.com/iswallet/go-ethereum/common"
@@ -39,6 +41,7 @@ type EVMLogger interface {
 	CaptureExit(output []byte, gasUsed uint64, err error)
 	// Opcode level
 	CaptureState(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error)
+	CaptureStateAfter(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error)
 	CaptureFault(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, depth int, err error)
 }
 
@@ -54,26 +57,30 @@ func FormatLogs(logs []StructLog) []types.StructLogRes {
 			Depth:   trace.Depth,
 			Error:   trace.ErrorString(),
 		}
-		if trace.Stack != nil {
+		if len(trace.Stack) != 0 {
 			stack := make([]string, len(trace.Stack))
 			for i, stackValue := range trace.Stack {
 				stack[i] = stackValue.Hex()
 			}
 			formatted[index].Stack = &stack
 		}
-		if trace.Memory != nil {
+		if len(trace.Memory) != 0 {
 			memory := make([]string, 0, (len(trace.Memory)+31)/32)
 			for i := 0; i+32 <= len(trace.Memory); i += 32 {
-				memory = append(memory, fmt.Sprintf("%x", trace.Memory[i:i+32]))
+				bytes := new(big.Int).SetBytes(trace.Memory[i : i+32]).Bytes()
+				memory = append(memory, hexutil.Encode(bytes))
 			}
 			formatted[index].Memory = &memory
 		}
-		if trace.Storage != nil {
+		if len(trace.Storage) != 0 {
 			storage := make(map[string]string)
 			for i, storageValue := range trace.Storage {
 				storage[fmt.Sprintf("%x", i)] = fmt.Sprintf("%x", storageValue)
 			}
 			formatted[index].Storage = &storage
+		}
+		if trace.ExtraData != nil {
+			formatted[index].ExtraData = trace.ExtraData.SealExtraData()
 		}
 	}
 	return formatted

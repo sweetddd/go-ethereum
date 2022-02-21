@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/state"
 	"github.com/iswallet/go-ethereum/core/vm"
 	"github.com/iswallet/go-ethereum/params"
@@ -44,6 +45,14 @@ func (d *dummyContractRef) SetBalance(*big.Int)        {}
 func (d *dummyContractRef) SetNonce(uint64)            {}
 func (d *dummyContractRef) Balance() *big.Int          { return new(big.Int) }
 
+// makeTestState create a sample test state to test node-wise reconstruction.
+func makeTestState() *state.StateDB {
+	// Create an empty state
+	db := state.NewDatabase(rawdb.NewMemoryDatabase())
+	stateDb, _ := state.New(common.Hash{}, db, nil)
+	return stateDb
+}
+
 type dummyStatedb struct {
 	state.StateDB
 }
@@ -55,7 +64,7 @@ func (*dummyStatedb) SetState(_ common.Address, _ common.Hash, _ common.Hash) {}
 func TestStoreCapture(t *testing.T) {
 	var (
 		logger   = NewStructLogger(nil)
-		env      = vm.NewEVM(vm.BlockContext{}, vm.TxContext{}, &dummyStatedb{}, params.TestChainConfig, vm.Config{Debug: true, Tracer: logger})
+		env      = vm.NewEVM(vm.BlockContext{}, vm.TxContext{}, makeTestState(), params.TestChainConfig, vm.Config{Debug: true, Tracer: logger})
 		contract = vm.NewContract(&dummyContractRef{}, &dummyContractRef{}, new(big.Int), 100000)
 	)
 	contract.Code = []byte{byte(vm.PUSH1), 0x1, byte(vm.PUSH1), 0x0, byte(vm.SSTORE)}

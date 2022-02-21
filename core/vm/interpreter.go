@@ -229,6 +229,9 @@ func (in *EVMInterpreter) Run(contract *Contract, input []byte, readOnly bool) (
 		if err != nil {
 			break
 		}
+		if in.evm.Config.Debug {
+			in.evm.Config.Tracer.CaptureStateAfter(pc, op, gasCopy, cost, callContext, in.returnData, in.evm.depth, err)
+		}
 		pc++
 	}
 

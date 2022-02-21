@@ -238,7 +238,7 @@ func testGenerateBlockAndImport(t *testing.T, isClique bool) {
 	// This test chain imports the mined blocks.
 	chain, _ := core.NewBlockChain(rawdb.NewMemoryDatabase(), nil, b.genesis, nil, engine, vm.Config{
 		Debug:  true,
-		Tracer: vm.NewStructLogger(&vm.LogConfig{EnableMemory: true})}, nil, nil)
+		Tracer: vm.NewStructLogger(&vm.LogConfig{EnableMemory: true, EnableReturnData: true})}, nil, nil)
 	defer chain.Stop()
 
 	// Ignore empty commit here for less noise.

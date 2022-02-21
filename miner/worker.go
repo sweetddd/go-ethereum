@@ -888,7 +888,7 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	env.receipts = append(env.receipts, receipt)
 	w.current.executionResults = append(w.current.executionResults, &types.ExecutionResult{
 		Gas:         receipt.GasUsed,
-		Failed:      receipt.Status == types.ReceiptStatusSuccessful,
+		Failed:      receipt.Status != types.ReceiptStatusSuccessful,
 		ReturnValue: fmt.Sprintf("%x", receipt.ReturnValue),
 		StructLogs:  vm.FormatLogs(tracer.StructLogs()),
 	})

@@ -103,7 +103,6 @@ var (
 	// Path-based trie node scheme.
 	trieNodeAccountPrefix = []byte("A") // trieNodeAccountPrefix + hexPath -> trie node
 	trieNodeStoragePrefix = []byte("O") // trieNodeStoragePrefix + accountHash + hexPath -> trie node
-	blockResultPrefix     = []byte("T") // blockResultPrefix + hash -> blockResult
 
 	PreimagePrefix = []byte("secure-key-")       // PreimagePrefix + hash -> preimage
 	configPrefix   = []byte("ethereum-config-")  // config prefix for the db
@@ -248,9 +247,4 @@ func accountTrieNodeKey(path []byte) []byte {
 // storageTrieNodeKey = trieNodeStoragePrefix + accountHash + nodePath.
 func storageTrieNodeKey(accountHash common.Hash, path []byte) []byte {
 	return append(append(trieNodeStoragePrefix, accountHash.Bytes()...), path...)
-}
-
-// blockResultKey = blockResultPrefix + hash
-func blockResultKey(hash common.Hash) []byte {
-	return append(blockResultPrefix, hash.Bytes()...)
 }
