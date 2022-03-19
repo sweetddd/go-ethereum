@@ -196,6 +196,10 @@ func (l *StructLogger) CaptureState(pc uint64, op vm.OpCode, gas, cost uint64, s
 			)
 			l.storage[contract.Address()][address] = value
 			storage = l.storage[contract.Address()].Copy()
+			extraData = types.NewExtraData()
+			if err := vm.traceStorageProof(l, scope, extraData); err != nil {
+				log.Warn("Failed to get proof", "contract address", contract.Address().String(), "key", address.String(), "err", err)
+			}
 		} else if op == vm.SSTORE && stackLen >= 2 {
 			// capture SSTORE opcodes and record the written entry in the local storage.
 			var (
