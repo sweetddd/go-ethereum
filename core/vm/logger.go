@@ -18,7 +18,9 @@ package vm
 
 import (
 	"fmt"
+	"github.com/iswallet/go-ethereum/common/hexutil"
 	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/eth/tracers/logger"
 	"math/big"
 
 	"github.com/iswallet/go-ethereum/common"
@@ -46,7 +48,7 @@ type EVMLogger interface {
 }
 
 // FormatLogs formats EVM returned structured logs for json output
-func FormatLogs(logs []StructLog) []types.StructLogRes {
+func FormatLogs(logs []logger.StructLog) []types.StructLogRes {
 	formatted := make([]types.StructLogRes, len(logs))
 	for index, trace := range logs {
 		formatted[index] = types.StructLogRes{
