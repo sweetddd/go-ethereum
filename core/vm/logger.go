@@ -52,12 +52,13 @@ func FormatLogs(logs []logger.StructLog) []types.StructLogRes {
 	formatted := make([]types.StructLogRes, len(logs))
 	for index, trace := range logs {
 		formatted[index] = types.StructLogRes{
-			Pc:      trace.Pc,
-			Op:      trace.Op.String(),
-			Gas:     trace.Gas,
-			GasCost: trace.GasCost,
-			Depth:   trace.Depth,
-			Error:   trace.ErrorString(),
+			Pc:            trace.Pc,
+			Op:            trace.Op.String(),
+			Gas:           trace.Gas,
+			GasCost:       trace.GasCost,
+			Depth:         trace.Depth,
+			RefundCounter: trace.RefundCounter,
+			Error:         trace.ErrorString(),
 		}
 		if len(trace.Stack) != 0 {
 			stack := make([]string, len(trace.Stack))
