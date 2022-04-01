@@ -877,6 +877,14 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	// reset tracer.
 	tracer := w.chain.GetVMConfig().Tracer.(*vm.StructLogger)
 	tracer.Reset()
+	// Get sender's address.
+	from, _ := types.Sender(w.current.signer, tx)
+	sender := &types.AccountProofWrapper{
+		Address:  from,
+		Nonce:    w.current.state.GetNonce(from),
+		Balance:  w.current.state.GetBalance(from),
+		CodeHash: w.current.state.GetCodeHash(from),
+	}
 
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &env.coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, *w.chain.GetVMConfig())
 	if err != nil {
@@ -888,6 +896,7 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	env.receipts = append(env.receipts, receipt)
 	w.current.executionResults = append(w.current.executionResults, &types.ExecutionResult{
 		Gas:         receipt.GasUsed,
+		Sender:      sender,
 		Failed:      receipt.Status != types.ReceiptStatusSuccessful,
 		ReturnValue: fmt.Sprintf("%x", receipt.ReturnValue),
 		StructLogs:  vm.FormatLogs(tracer.StructLogs()),
