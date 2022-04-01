@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/iswallet/go-ethereum/common"
-	"math/big"
 )
 
 // BlockResult contains block execution traces and results required for rollers.
@@ -58,7 +57,7 @@ type ExtraData struct {
 type AccountProofWrapper struct {
 	Address  common.Address       `json:"address"`
 	Nonce    uint64               `json:"nonce"`
-	Balance  *big.Int             `json:"balance"`
+	Balance  string               `json:"balance"` // balance big.Int string
 	CodeHash common.Hash          `json:"codeHash,omitempty"`
 	Proof    []string             `json:"proof,omitempty"`
 	Storage  *StorageProofWrapper `json:"storage,omitempty"` // StorageProofWrapper can be empty if irrelated to storage operation

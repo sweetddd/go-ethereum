@@ -882,7 +882,7 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	sender := &types.AccountProofWrapper{
 		Address:  from,
 		Nonce:    w.current.state.GetNonce(from),
-		Balance:  w.current.state.GetBalance(from),
+		Balance:  w.current.state.GetBalance(from).String(),
 		CodeHash: w.current.state.GetCodeHash(from),
 	}
 
