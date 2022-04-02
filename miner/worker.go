@@ -27,6 +27,7 @@ import (
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common/hexutil"
 	"github.com/iswallet/go-ethereum/consensus"
 	"github.com/iswallet/go-ethereum/consensus/misc"
 	"github.com/iswallet/go-ethereum/core"
@@ -882,7 +883,7 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 	sender := &types.AccountProofWrapper{
 		Address:  from,
 		Nonce:    w.current.state.GetNonce(from),
-		Balance:  w.current.state.GetBalance(from).String(),
+		Balance:  (*hexutil.Big)(w.current.state.GetBalance(from)),
 		CodeHash: w.current.state.GetCodeHash(from),
 	}
 
