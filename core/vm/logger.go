@@ -18,7 +18,6 @@ package vm
 
 import (
 	"fmt"
-	"github.com/iswallet/go-ethereum/common/hexutil"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/eth/tracers/logger"
 	"math/big"
@@ -67,10 +66,10 @@ func FormatLogs(logs []logger.StructLog) []types.StructLogRes {
 			}
 			formatted[index].Stack = &stack
 		}
-		if len(trace.Memory) != 0 {
-			memory := make([]string, 0, (len(trace.Memory)+31)/32)
-			for i := 0; i+32 <= len(trace.Memory); i += 32 {
-				memory = append(memory, fmt.Sprintf("%x", trace.Memory[i:i+32]))
+		if trace.Memory.Len() != 0 {
+			memory := make([]string, 0, (trace.Memory.Len()+31)/32)
+			for i := 0; i+32 <= trace.Memory.Len(); i += 32 {
+				memory = append(memory, fmt.Sprintf("%x", trace.Memory.Bytes()[i:i+32]))
 			}
 			formatted[index].Memory = &memory
 		}
