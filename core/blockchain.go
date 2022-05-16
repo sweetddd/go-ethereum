@@ -137,6 +137,7 @@ type CacheConfig struct {
 	TrieTimeLimit       time.Duration // Time limit after which to flush the current in-memory trie to disk
 	SnapshotLimit       int           // Memory allowance (MB) to use for caching snapshot entries in memory
 	Preimages           bool          // Whether to store preimage of trie key to the disk
+	TraceCacheLimit     int
 
 	SnapshotNoBuild bool // Whether the background generation is allowed
 	SnapshotWait    bool // Wait for snapshot construction on startup. TODO(karalabe): This is a dirty hack for testing, nuke it
@@ -145,11 +146,12 @@ type CacheConfig struct {
 // defaultCacheConfig are the default caching values if none are specified by the
 // user (also used during testing).
 var defaultCacheConfig = &CacheConfig{
-	TrieCleanLimit: 256,
-	TrieDirtyLimit: 256,
-	TrieTimeLimit:  5 * time.Minute,
-	SnapshotLimit:  256,
-	SnapshotWait:   true,
+	TrieCleanLimit:  256,
+	TrieDirtyLimit:  256,
+	TrieTimeLimit:   5 * time.Minute,
+	SnapshotLimit:   256,
+	SnapshotWait:    true,
+	TraceCacheLimit: 32,
 }
 
 // BlockChain represents the canonical chain given a database with a genesis
@@ -213,7 +215,7 @@ type BlockChain struct {
 
 	// future blocks are blocks added for later processing
 	futureBlocks *lru.Cache[common.Hash, *types.Block]
-	blockResultCache *lru.Cache     // Cache for the most recent block results.
+	blockResultCache *lru.Cache[common.Hash, *types.BlockResult]     // Cache for the most recent block results.
 
 	wg            sync.WaitGroup //
 	quit          chan struct{}  // shutdown signal, closed in Stop.
@@ -256,6 +258,10 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 	}
 	log.Info(strings.Repeat("-", 153))
 	log.Info("")
+	blockResultCache := lru.NewCache[common.Hash,*types.BlockResult](blockResultCacheLimit)
+	if cacheConfig.TraceCacheLimit != 0 {
+		blockResultCache = lru.NewCache[common.Hash,*types.BlockResult](cacheConfig.TraceCacheLimit)
+	}
 
 	bc := &BlockChain{
 		chainConfig:   chainConfig,
@@ -272,7 +278,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		blockCache:    lru.NewCache[common.Hash, *types.Block](blockCacheLimit),
 		txLookupCache: lru.NewCache[common.Hash, *rawdb.LegacyTxLookupEntry](txLookupCacheLimit),
 		futureBlocks:  lru.NewCache[common.Hash, *types.Block](maxFutureBlocks),
-		blockResultCache: lru.NewCache(blockResultCacheLimit),
+		blockResultCache: blockResultCache,
 		engine:        engine,
 		vmConfig:      vmConfig,
 	}

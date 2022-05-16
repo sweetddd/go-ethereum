@@ -273,6 +273,12 @@ var (
 		Usage:    "Manually specify the Shanghai fork timestamp, overriding the bundled setting",
 		Category: flags.EthCategory,
 	}
+	// NoTrace settings
+	TraceCacheLimit = cli.IntFlag{
+		Name:  "trace.limit",
+		Usage: "Handle the latest several blockResults",
+		Value: ethconfig.Defaults.TraceCacheLimit,
+	}
 	// Light server and client settings
 	LightServeFlag = &cli.IntFlag{
 		Name:     "light.serve",
@@ -1347,6 +1353,13 @@ func MakeAddress(ks *keystore.KeyStore, account string) (accounts.Account, error
 	return accs[index], nil
 }
 
+func setTrace(ctx *cli.Context, cfg *ethconfig.Config) {
+	// NoTrace flag
+	if ctx.GlobalIsSet(TraceCacheLimit.Name) {
+		cfg.TraceCacheLimit = ctx.GlobalInt(TraceCacheLimit.Name)
+	}
+}
+
 // setEtherbase retrieves the etherbase from the directly specified command line flags.
 func setEtherbase(ctx *cli.Context, cfg *ethconfig.Config) {
 	if !ctx.IsSet(MinerEtherbaseFlag.Name) {
@@ -1738,6 +1751,7 @@ func SetEthConfig(ctx *cli.Context, stack *node.Node, cfg *ethconfig.Config) {
 	if ctx.IsSet(LightServeFlag.Name) && ctx.Uint64(TxLookupLimitFlag.Name) != 0 {
 		log.Warn("LES server cannot serve old transaction status and cannot connect below les/4 protocol version if transaction lookup index is limited")
 	}
+	setTrace(ctx, cfg)
 	setEtherbase(ctx, cfg)
 	setGPO(ctx, &cfg.GPO, ctx.String(SyncModeFlag.Name) == "light")
 	setTxPool(ctx, &cfg.TxPool)
