@@ -51,6 +51,8 @@ type StateDB interface {
 	GetTransientState(addr common.Address, key common.Hash) common.Hash
 	SetTransientState(addr common.Address, key, value common.Hash)
 
+	GetRootHash() common.Hash
+	GetLiveStateAccount(addr common.Address) *types.StateAccount
 	GetProof(addr common.Address) ([][]byte, error)
 	GetProofByHash(addrHash common.Hash) ([][]byte, error)
 	GetStorageProof(a common.Address, key common.Hash) ([][]byte, error)
