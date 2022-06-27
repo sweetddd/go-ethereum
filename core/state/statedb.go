@@ -194,6 +194,10 @@ func (s *StateDB) Error() error {
 	return s.dbErr
 }
 
+func (s *StateDB) IsZktrie() bool {
+	return s.db.TrieDB().Zktrie
+}
+
 func (s *StateDB) AddLog(log *types.Log) {
 	s.journal.append(addLogChange{txhash: s.thash})
 
@@ -325,11 +329,19 @@ func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 
 // GetProof returns the Merkle proof for a given account.
 func (s *StateDB) GetProof(addr common.Address) ([][]byte, error) {
+	if s.IsZktrie() {
+		var proof proofList
+		err := s.trie.Prove(addr.Bytes32(), 0, &proof)
+		return proof, err
+	}
 	return s.GetProofByHash(crypto.Keccak256Hash(addr.Bytes()))
 }
 
 // GetProofByHash returns the Merkle proof for a given account.
 func (s *StateDB) GetProofByHash(addrHash common.Hash) ([][]byte, error) {
+	if s.IsZktrie() {
+		panic("unimplemented")
+	}
 	var proof proofList
 	err := s.trie.Prove(addrHash[:], 0, &proof)
 	return proof, err
@@ -349,6 +361,7 @@ func (s *StateDB) GetRootHash() common.Hash {
 
 // StorageTrieProof is not in Db interface and used explictily for reading proof in storage trie (not the dirty value)
 func (s *StateDB) GetStorageTrieProof(a common.Address, key common.Hash) ([][]byte, error) {
+
 	// try the trie in stateObject first, else we would create one
 	stateObject := s.getStateObject(a)
 	if stateObject == nil {
@@ -366,7 +379,11 @@ func (s *StateDB) GetStorageTrieProof(a common.Address, key common.Hash) ([][]by
 	}
 
 	var proof proofList
-	err = trie.Prove(crypto.Keccak256(key.Bytes()), 0, &proof)
+	if s.IsZktrie() {
+		err = trie.Prove(key.Bytes(), 0, &proof)
+	} else {
+		err = trie.Prove(crypto.Keccak256(key.Bytes()), 0, &proof)
+	}
 	return proof, err
 }
 
@@ -379,10 +396,18 @@ func (s *StateDB) GetStorageProof(a common.Address, key common.Hash) ([][]byte, 
 	if trie == nil {
 		return nil, errors.New("storage trie for requested address does not exist")
 	}
+
 	var proof proofList
-	err = trie.Prove(crypto.Keccak256(key.Bytes()), 0, &proof)
-	if err != nil {
-		return nil, err
+	if s.IsZktrie() {
+		err = trie.Prove(key.Bytes(), 0, &proof)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err = trie.Prove(crypto.Keccak256(key.Bytes()), 0, &proof)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return proof, nil
 }
@@ -614,7 +639,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 				data.CodeHash = types.EmptyCodeHash.Bytes()
 			}
 			if data.Root == (common.Hash{}) {
-				data.Root = types.EmptyRootHash
+				data.Root = s.db.TrieDB().EmptyRoot()
 			}
 		}
 	}
@@ -633,6 +658,18 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		if data == nil {
 			return nil
 		}
+
+		data = new(types.StateAccount)
+		if s.IsZktrie() {
+			data, err = types.UnmarshalStateAccount(enc)
+		} else {
+			err = rlp.DecodeBytes(enc, data)
+		}
+		if err != nil {
+			log.Error("Failed to decode state object", "addr", addr, "err", err)
+			return nil
+		}
+
 	}
 	// Insert into the live set
 	obj := newObject(s, addr, *data)

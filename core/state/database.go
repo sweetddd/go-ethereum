@@ -137,6 +137,7 @@ func NewDatabase(db ethdb.Database) Database {
 // large memory cache.
 func NewDatabaseWithConfig(db ethdb.Database, config *trie.Config) Database {
 	return &cachingDB{
+		zktrie:        config != nil && config.Zktrie,
 		disk:          db,
 		codeSizeCache: lru.NewCache[common.Hash, int](codeSizeCacheSize),
 		codeCache:     lru.NewSizeConstrainedCache[common.Hash, []byte](codeCacheSize),
@@ -147,6 +148,7 @@ func NewDatabaseWithConfig(db ethdb.Database, config *trie.Config) Database {
 // NewDatabaseWithNodeDB creates a state database with an already initialized node database.
 func NewDatabaseWithNodeDB(db ethdb.Database, triedb *trie.Database) Database {
 	return &cachingDB{
+		zktrie:        config != nil && config.Zktrie,
 		disk:          db,
 		codeSizeCache: lru.NewCache[common.Hash, int](codeSizeCacheSize),
 		codeCache:     lru.NewSizeConstrainedCache[common.Hash, []byte](codeCacheSize),
@@ -159,10 +161,18 @@ type cachingDB struct {
 	codeSizeCache *lru.Cache[common.Hash, int]
 	codeCache     *lru.SizeConstrainedCache[common.Hash, []byte]
 	triedb        *trie.Database
+	zktrie        bool
 }
 
 // OpenTrie opens the main account trie at a specific root hash.
 func (db *cachingDB) OpenTrie(root common.Hash) (Trie, error) {
+	if db.zktrie {
+		tr, err := trie.NewZkTrie(root, trie.NewZktrieDatabaseFromTriedb(db.db))
+		if err != nil {
+			return nil, err
+		}
+		return tr, nil
+	}
 	tr, err := trie.NewStateTrie(trie.StateTrieID(root), db.triedb)
 	if err != nil {
 		return nil, err
@@ -172,6 +182,13 @@ func (db *cachingDB) OpenTrie(root common.Hash) (Trie, error) {
 
 // OpenStorageTrie opens the storage trie of an account.
 func (db *cachingDB) OpenStorageTrie(stateRoot common.Hash, addrHash, root common.Hash) (Trie, error) {
+	if db.zktrie {
+		tr, err := trie.NewZkTrie(root, trie.NewZktrieDatabaseFromTriedb(db.db))
+		if err != nil {
+			return nil, err
+		}
+		return tr, nil
+	}
 	tr, err := trie.NewStateTrie(trie.StorageTrieID(stateRoot, addrHash, root), db.triedb)
 	if err != nil {
 		return nil, err
@@ -183,6 +200,8 @@ func (db *cachingDB) OpenStorageTrie(stateRoot common.Hash, addrHash, root commo
 func (db *cachingDB) CopyTrie(t Trie) Trie {
 	switch t := t.(type) {
 	case *trie.StateTrie:
+		return t.Copy()
+	case *trie.ZkTrie:
 		return t.Copy()
 	default:
 		panic(fmt.Errorf("unknown trie type %T", t))

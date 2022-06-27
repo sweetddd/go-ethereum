@@ -243,6 +243,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		Cache:     cacheConfig.TrieCleanLimit,
 		Journal:   cacheConfig.TrieCleanJournal,
 		Preimages: cacheConfig.Preimages,
+		Zktrie:    chainConfig.Zktrie,
 	})
 	// Setup the genesis block, commit the provided genesis specification
 	// to database if the genesis block is not present yet, or load the
@@ -261,6 +262,11 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 	blockResultCache := lru.NewCache[common.Hash,*types.BlockResult](blockResultCacheLimit)
 	if cacheConfig.TraceCacheLimit != 0 {
 		blockResultCache = lru.NewCache[common.Hash,*types.BlockResult](cacheConfig.TraceCacheLimit)
+	}
+	// override snapshot setting
+	if chainConfig.Zktrie && cacheConfig.SnapshotLimit > 0 {
+		log.Warn("snapshot has been disabled by zktrie")
+		cacheConfig.SnapshotLimit = 0
 	}
 
 	bc := &BlockChain{

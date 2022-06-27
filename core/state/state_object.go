@@ -97,6 +97,7 @@ func newObject(db *StateDB, address common.Address, data types.StateAccount) *st
 	}
 	if data.Root == (common.Hash{}) {
 		data.Root = types.EmptyRootHash
+		data.Root = db.db.TrieDB().EmptyRoot()
 	}
 	return &stateObject{
 		db:             db,
@@ -136,7 +137,7 @@ func (s *stateObject) getTrie(db Database) (Trie, error) {
 	if s.trie == nil {
 		// Try fetching from prefetcher first
 		// We don't prefetch empty tries
-		if s.data.Root != types.EmptyRootHash && s.db.prefetcher != nil {
+		if s.data.Root != s.db.db.TrieDB().EmptyRoot() && s.db.prefetcher != nil {
 			// When the miner is creating the pending state, there is no
 			// prefetcher
 			s.trie = s.db.prefetcher.trie(s.addrHash, s.data.Root)
@@ -211,12 +212,17 @@ func (s *stateObject) GetCommittedState(db Database, key common.Hash) common.Has
 		}
 	}
 	var value common.Hash
-	if len(enc) > 0 {
-		_, content, _, err := rlp.Split(enc)
-		if err != nil {
-			s.db.setError(err)
+
+	if db.TrieDB().Zktrie {
+		value = common.BytesToHash(enc)
+	} else {
+		if len(enc) > 0 {
+			_, content, _, err := rlp.Split(enc)
+			if err != nil {
+				s.db.setError(err)
+			}
+			value.SetBytes(content)
 		}
-		value.SetBytes(content)
 	}
 	s.originStorage[key] = value
 	return value
@@ -252,7 +258,7 @@ func (s *stateObject) finalise(prefetch bool) {
 			slotsToPrefetch = append(slotsToPrefetch, common.CopyBytes(key[:])) // Copy needed for closure
 		}
 	}
-	if s.db.prefetcher != nil && prefetch && len(slotsToPrefetch) > 0 && s.data.Root != types.EmptyRootHash {
+	if s.db.prefetcher != nil && prefetch && len(slotsToPrefetch) > 0 && s.data.Root != s.db.db.TrieDB().EmptyRoot() {
 		s.db.prefetcher.prefetch(s.addrHash, s.data.Root, slotsToPrefetch)
 	}
 	if len(s.dirtyStorage) > 0 {
@@ -306,6 +312,16 @@ func (s *stateObject) updateTrie(db Database) (Trie, error) {
 				s.db.setError(err)
 				return nil, err
 			}
+
+			if db.TrieDB().Zktrie {
+				v = common.CopyBytes(value[:])
+			} else {
+				// Encoding []byte cannot fail, ok to ignore the error.
+				v, _ = rlp.EncodeToBytes(common.TrimLeftZeroes(value[:]))
+			}
+
+
+
 			s.db.StorageUpdated += 1
 		}
 		// If state snapshotting is active, cache the data til commit
