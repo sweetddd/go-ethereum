@@ -1,17 +1,12 @@
 package types
 
 import (
-<<<<<<< HEAD
+	"encoding/json"
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/common/hexutil"
 
-=======
 	"runtime"
 	"sync"
-
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/common/hexutil"
->>>>>>> 9b99f2e17 (fix bug and optimize fill_trace logic for gc (#104))
 )
 
 var (
@@ -31,6 +26,7 @@ type BlockResult struct {
 	BlockTrace       *BlockTrace        `json:"blockTrace"`
 	StorageTrace     *StorageTrace      `json:"storageTrace"`
 	ExecutionResults []*ExecutionResult `json:"executionResults"`
+	MPTWitness       *json.RawMessage   `json:"mptwitness,omitempty"`
 }
 
 // StorageTrace stores proofs of storage needed by storage circuit

@@ -150,6 +150,7 @@ func makeConfigNode(ctx *cli.Context) (*node.Node, gethConfig) {
 	if ctx.IsSet(utils.EthStatsURLFlag.Name) {
 		cfg.Ethstats.URL = ctx.String(utils.EthStatsURLFlag.Name)
 	}
+	applyTraceConfig(ctx, &cfg.Eth)
 	applyMetricConfig(ctx, &cfg)
 
 	return stack, cfg
@@ -211,6 +212,12 @@ func dumpConfig(ctx *cli.Context) error {
 	dump.Write(out)
 
 	return nil
+}
+
+func applyTraceConfig(ctx *cli.Context, cfg *ethconfig.Config) {
+	subCfg := debug.ConfigTrace(ctx)
+	cfg.TraceCacheLimit = subCfg.TraceCacheLimit
+	cfg.MPTWitness = subCfg.MPTWitness
 }
 
 func applyMetricConfig(ctx *cli.Context, cfg *gethConfig) {

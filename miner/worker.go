@@ -1322,6 +1322,7 @@ func (w *worker) commit(env *environment, interval func(), update bool, start ti
 		// Create a local environment copy, avoid the data race with snapshot state.
 		// https://github.com/ethereum/go-ethereum/issues/24299
 		env := env.copy()
+		// when block is not mined by myself, we just omit
 		// complete storage before Finalize state (only RootAfter left unknown)
 		storage := &types.StorageTrace{
 			RootBefore:    s.GetRootHash(),
@@ -1333,6 +1334,7 @@ func (w *worker) commit(env *environment, interval func(), update bool, start ti
 		if err != nil {
 			return err
 		}
+		storage.RootAfter = block.Header().Root
 		// If we're post merge, just ignore
 		if !w.isTTDReached(block.Header()) {
 			select {

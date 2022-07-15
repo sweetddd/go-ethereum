@@ -138,6 +138,7 @@ type CacheConfig struct {
 	SnapshotLimit       int           // Memory allowance (MB) to use for caching snapshot entries in memory
 	Preimages           bool          // Whether to store preimage of trie key to the disk
 	TraceCacheLimit     int
+	MPTWitness          int // How to generate witness data for mpt circuit, 0: nothing, 1: natural
 
 	SnapshotNoBuild bool // Whether the background generation is allowed
 	SnapshotWait    bool // Wait for snapshot construction on startup. TODO(karalabe): This is a dirty hack for testing, nuke it
@@ -152,6 +153,7 @@ var defaultCacheConfig = &CacheConfig{
 	SnapshotLimit:   256,
 	SnapshotWait:    true,
 	TraceCacheLimit: 32,
+	MPTWitness:      int(zkproof.MPTWitnessNothing),
 }
 
 // BlockChain represents the canonical chain given a database with a genesis
@@ -1524,7 +1526,6 @@ func (bc *BlockChain) writeBlockResult(state *state.StateDB, block *types.Block,
 	}
 
 	blockResult.BlockTrace = types.NewTraceBlock(bc.chainConfig, block, &coinbase)
-	blockResult.StorageTrace.RootAfter = state.GetRootHash()
 	for i, tx := range block.Transactions() {
 		evmTrace := blockResult.ExecutionResults[i]
 		// Contract is called
@@ -1537,6 +1538,11 @@ func (bc *BlockChain) writeBlockResult(state *state.StateDB, block *types.Block,
 			evmTrace.ByteCode = hexutil.Encode(tx.Data())
 		}
 	}
+
+	if err := zkproof.FillBlockResultForMPTWitness(zkproof.MPTWitnessType(bc.cacheConfig.MPTWitness), blockResult); err != nil {
+		log.Error("fill mpt witness fail", "error", err)
+	}
+
 	return blockResult
 }
 

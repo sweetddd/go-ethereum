@@ -194,6 +194,7 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 			SnapshotLimit:       config.SnapshotCache,
 			Preimages:           config.Preimages,
 			TraceCacheLimit:     config.TraceCacheLimit,
+			MPTWitness:          config.MPTWitness,
 		}
 	)
 	// Override the chain config with provided settings.
