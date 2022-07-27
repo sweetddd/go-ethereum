@@ -660,11 +660,20 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 	if state == nil || err != nil {
 		return nil, err
 	}
+
+	zktrie := s.b.ChainConfig().Zktrie
+
 	storageTrie, err := state.StorageTrie(address)
 	if err != nil {
 		return nil, err
 	}
-	storageHash := types.EmptyRootHash
+
+	var storageHash common.Hash
+	if !zktrie {
+		storageHash = types.EmptyRootHash
+	}
+
+
 	codeHash := state.GetCodeHash(address)
 	storageProof := make([]StorageResult, len(storageKeys))
 
