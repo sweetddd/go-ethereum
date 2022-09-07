@@ -33,6 +33,7 @@ import (
 	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
@@ -741,7 +742,7 @@ func makeAccounts(size int) (addresses [][20]byte, accounts [][]byte) {
 		var (
 			nonce = uint64(random.Int63())
 			root  = types.EmptyRootHash
-			code  = crypto.Keccak256(nil)
+			code  = codehash.EmptyCodeHash.Bytes()
 		)
 		// The big.Rand function is not deterministic with regards to 64 vs 32 bit systems,
 		// and will consume different amount of data from the rand source.

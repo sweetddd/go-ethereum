@@ -24,7 +24,7 @@ import (
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/rlp"
 	"github.com/iswallet/go-ethereum/trie"
@@ -58,12 +58,12 @@ func makeTestState() (ethdb.Database, Database, common.Hash, []*testAccount) {
 		acc.nonce = uint64(42 * i)
 
 		if i%3 == 0 {
-			obj.SetCode(crypto.Keccak256Hash([]byte{i, i, i, i, i}), []byte{i, i, i, i, i})
+			obj.SetCode(codehash.CodeHash([]byte{i, i, i, i, i}), []byte{i, i, i, i, i})
 			acc.code = []byte{i, i, i, i, i}
 		}
 		if i%5 == 0 {
 			for j := byte(0); j < 5; j++ {
-				hash := crypto.Keccak256Hash([]byte{i, i, i, i, i, j, j})
+				hash := codehash.CodeHash([]byte{i, i, i, i, i, j, j})
 				obj.SetState(sdb, hash, hash)
 			}
 		}
@@ -551,7 +551,7 @@ func TestIncompleteStateSync(t *testing.T) {
 	var isCode = make(map[common.Hash]struct{})
 	for _, acc := range srcAccounts {
 		if len(acc.code) > 0 {
-			isCode[crypto.Keccak256Hash(acc.code)] = struct{}{}
+			isCode[codehash.CodeHash(acc.code)] = struct{}{}
 		}
 	}
 	isCode[types.EmptyCodeHash] = struct{}{}

@@ -31,10 +31,6 @@ import (
 	"github.com/iswallet/go-ethereum/trie"
 )
 
-var (
-	sha3Nil = crypto.Keccak256Hash(nil)
-)
-
 func NewState(ctx context.Context, head *types.Header, odr OdrBackend) *state.StateDB {
 	state, _ := state.New(head.Root, NewStateDatabase(ctx, head, odr), nil)
 	return state
@@ -72,7 +68,7 @@ func (db *odrDatabase) CopyTrie(t state.Trie) state.Trie {
 }
 
 func (db *odrDatabase) ContractCode(addrHash, codeHash common.Hash) ([]byte, error) {
-	if codeHash == sha3Nil {
+	if codeHash == codehash.EmptyCodeHash {
 		return nil, nil
 	}
 	code := rawdb.ReadCode(db.backend.Database(), codeHash)

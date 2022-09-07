@@ -682,7 +682,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 		storageHash = storageTrie.Hash()
 	} else {
 		// no storageTrie means the account does not exist, so the codeHash is the hash of an empty bytearray.
-		codeHash = crypto.Keccak256Hash(nil)
+		codeHash = codehash.EmptyCodeHash
 	}
 
 	// create the proof for the storageKeys

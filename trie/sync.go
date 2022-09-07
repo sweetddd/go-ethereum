@@ -25,6 +25,7 @@ import (
 	"github.com/iswallet/go-ethereum/common/prque"
 	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/log"
 )
@@ -221,6 +222,11 @@ func (s *Sync) AddCodeEntry(hash common.Hash, path []byte, parent common.Hash, p
 	if hash == types.EmptyCodeHash {
 		return
 	}
+
+	if hash == codehash.EmptyCodeHash {
+		return
+	}
+
 	if s.membatch.hasCode(hash) {
 		return
 	}
