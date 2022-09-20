@@ -84,6 +84,7 @@ type Backend interface {
 	GetTransaction(ctx context.Context, txHash common.Hash) (*types.Transaction, common.Hash, uint64, uint64, error)
 	RPCGasCap() uint64
 	ChainConfig() *params.ChainConfig
+	CacheConfig() *core.CacheConfig
 	Engine() consensus.Engine
 	ChainDb() ethdb.Database
 	StateAtBlock(ctx context.Context, block *types.Block, reexec uint64, base *state.StateDB, readOnly bool, preferDisk bool) (*state.StateDB, StateReleaseFunc, error)
@@ -1021,6 +1022,12 @@ func APIs(backend Backend) []rpc.API {
 		{
 			Namespace: "debug",
 			Service:   NewAPI(backend),
+		},
+		{
+			Namespace: "scroll",
+			Version:   "1.0",
+			Service:   TraceBlock(NewAPI(backend)),
+			Public:    true,
 		},
 	}
 }

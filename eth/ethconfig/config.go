@@ -208,8 +208,7 @@ type Config struct {
 	// OverrideShanghai (TODO: remove after the fork)
 	OverrideShanghai *uint64 `toml:",omitempty"`
 	// Trace option
-	TraceCacheLimit int
-	MPTWitness      int
+	MPTWitness int
 }
 
 // CreateConsensusEngine creates a consensus engine for the given chain configuration.
