@@ -663,6 +663,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		if s.IsZktrie() {
 			data, err = types.UnmarshalStateAccount(enc)
 		} else {
+			data = new(types.StateAccount)
 			err = rlp.DecodeBytes(enc, data)
 		}
 		if err != nil {
