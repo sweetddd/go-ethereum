@@ -24,6 +24,8 @@ import (
 	"sort"
 	"time"
 
+	zkt "github.com/iswallet/zktrie/types"
+
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/state/snapshot"
@@ -330,18 +332,14 @@ func (s *StateDB) GetState(addr common.Address, hash common.Hash) common.Hash {
 // GetProof returns the Merkle proof for a given account.
 func (s *StateDB) GetProof(addr common.Address) ([][]byte, error) {
 	if s.IsZktrie() {
-		var proof proofList
-		err := s.trie.Prove(addr.Bytes32(), 0, &proof)
-		return proof, err
+		addr_s, _ := zkt.ToSecureKeyBytes(addr.Bytes())
+		return s.GetProofByHash(common.BytesToHash(addr_s.Bytes()))
 	}
 	return s.GetProofByHash(crypto.Keccak256Hash(addr.Bytes()))
 }
 
 // GetProofByHash returns the Merkle proof for a given account.
 func (s *StateDB) GetProofByHash(addrHash common.Hash) ([][]byte, error) {
-	if s.IsZktrie() {
-		panic("unimplemented")
-	}
 	var proof proofList
 	err := s.trie.Prove(addrHash[:], 0, &proof)
 	return proof, err
@@ -380,7 +378,8 @@ func (s *StateDB) GetStorageTrieProof(a common.Address, key common.Hash) ([][]by
 
 	var proof proofList
 	if s.IsZktrie() {
-		err = trie.Prove(key.Bytes(), 0, &proof)
+		key_s, _ := zkt.ToSecureKeyBytes(key.Bytes())
+		err = trie.Prove(key_s.Bytes(), 0, &proof)
 	} else {
 		err = trie.Prove(crypto.Keccak256(key.Bytes()), 0, &proof)
 	}
@@ -399,7 +398,9 @@ func (s *StateDB) GetStorageProof(a common.Address, key common.Hash) ([][]byte, 
 
 	var proof proofList
 	if s.IsZktrie() {
-		err = trie.Prove(key.Bytes(), 0, &proof)
+		key_s, _ := zkt.ToSecureKeyBytes(key.Bytes())
+		err = trie.Prove(key_s.Bytes(), 0, &proof)
+
 		if err != nil {
 			return nil, err
 		}
