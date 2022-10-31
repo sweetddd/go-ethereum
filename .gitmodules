@@ -6,3 +6,6 @@
 	path = tests/evm-benchmarks
 	url = https://github.com/ipsilon/evm-benchmarks
 	shallow = true
+[submodule "internal/utesting/blocktraces"]
+	path = internal/utesting/blocktraces
+	url = git@github.com:scroll-tech/test-traces.git
