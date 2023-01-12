@@ -252,6 +252,7 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		Zktrie: 					   false,
+		FeeVaultAddress: 			   nil,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -283,6 +284,7 @@ var (
 		Ethash:                        nil,
 		Clique:                        &CliqueConfig{Period: 0, Epoch: 30000},
 		Zktrie: 					   false,
+		FeeVaultAddress: nil,
 	}
 
 	// TestChainConfig contains every protocol change (EIPs) introduced
@@ -313,6 +315,7 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
+		FeeVaultAddress: &common.Address{123},
 	}
 
 	// NonActivatedConfig defines the chain configuration without activating
@@ -454,8 +457,11 @@ type ChainConfig struct {
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
-	// Use zktrie
+	// Scroll genesis extension: Use zktrie
 	Zktrie bool `json:"zktrie,omitempty"`
+
+	// Scroll genesis extension: Transaction fee vault address [optional]
+	FeeVaultAddress *common.Address `json:"feeVaultAddress,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
