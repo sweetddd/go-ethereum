@@ -253,6 +253,8 @@ var (
 		Clique:                        nil,
 		Zktrie: 					   false,
 		FeeVaultAddress: 			   nil,
+		EnableEIP1559: true,
+		EnableEIP2718: true,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -285,6 +287,8 @@ var (
 		Clique:                        &CliqueConfig{Period: 0, Epoch: 30000},
 		Zktrie: 					   false,
 		FeeVaultAddress: nil,
+		EnableEIP2718: true,
+		EnableEIP1559: true,
 	}
 
 	// TestChainConfig contains every protocol change (EIPs) introduced
@@ -316,6 +320,8 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		FeeVaultAddress: &common.Address{123},
+		EnableEIP1559: true,
+		EnableEIP2718: true,
 	}
 
 	// NonActivatedConfig defines the chain configuration without activating
@@ -462,6 +468,12 @@ type ChainConfig struct {
 
 	// Scroll genesis extension: Transaction fee vault address [optional]
 	FeeVaultAddress *common.Address `json:"feeVaultAddress,omitempty"`
+
+	// Scroll genesis extension: enable EIP-2718 in tx pool.
+	EnableEIP2718 bool `json:"enableEIP2718,omitempty"`
+
+	// Scroll genesis extension: enable EIP-1559 in tx pool, EnableEIP2718 should be true too.
+	EnableEIP1559 bool `json:"enableEIP1559,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
