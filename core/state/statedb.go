@@ -304,20 +304,28 @@ func (s *StateDB) GetCode(addr common.Address) []byte {
 	return nil
 }
 
-func (s *StateDB) GetCodeSize(addr common.Address) int {
+func (s *StateDB) GetCodeSize(addr common.Address) uint64 {
 	stateObject := s.getStateObject(addr)
 	if stateObject != nil {
-		return stateObject.CodeSize(s.db)
+		return stateObject.CodeSize()
 	}
 	return 0
 }
 
-func (s *StateDB) GetCodeHash(addr common.Address) common.Hash {
+func (s *StateDB) GetPoseidonCodeHash(addr common.Address) common.Hash {
 	stateObject := s.getStateObject(addr)
 	if stateObject == nil {
 		return common.Hash{}
 	}
-	return common.BytesToHash(stateObject.CodeHash())
+	return common.BytesToHash(stateObject.PoseidonCodeHash())
+}
+
+func (s *StateDB) GetKeccakCodeHash(addr common.Address) common.Hash {
+	stateObject := s.getStateObject(addr)
+	if stateObject == nil {
+		return common.Hash{}
+	}
+	return common.BytesToHash(stateObject.KeccakCodeHash())
 }
 
 // GetState retrieves a value from the given account's storage trie.
@@ -487,7 +495,7 @@ func (s *StateDB) SetNonce(addr common.Address, nonce uint64) {
 func (s *StateDB) SetCode(addr common.Address, code []byte) {
 	stateObject := s.GetOrNewStateObject(addr)
 	if stateObject != nil {
-		stateObject.SetCode(codehash.CodeHash(code), code)
+		stateObject.SetCode(code)
 	}
 }
 
@@ -582,7 +590,7 @@ func (s *StateDB) updateStateObject(obj *stateObject) {
 	// enough to track account updates at commit time, deletions need tracking
 	// at transaction boundary level to ensure we capture state clearing.
 	if s.snap != nil {
-		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.CodeHash)
+		s.snapAccounts[obj.addrHash] = snapshot.SlimAccountRLP(obj.data.Nonce, obj.data.Balance, obj.data.Root, obj.data.KeccakCodeHash, obj.data.PoseidonCodeHash, obj.data.CodeSize)
 	}
 }
 
@@ -631,13 +639,17 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 				return nil
 			}
 			data = &types.StateAccount{
-				Nonce:    acc.Nonce,
-				Balance:  acc.Balance,
-				CodeHash: acc.CodeHash,
-				Root:     common.BytesToHash(acc.Root),
+				Nonce:            acc.Nonce,
+				Balance:          acc.Balance,
+				Root:             common.BytesToHash(acc.Root),
+				KeccakCodeHash:   acc.KeccakCodeHash,
+				PoseidonCodeHash: acc.PoseidonCodeHash,
+				CodeSize:         acc.CodeSize,
 			}
-			if len(data.CodeHash) == 0 {
-				data.CodeHash = types.EmptyCodeHash.Bytes()
+			if len(data.KeccakCodeHash) == 0 {
+				data.KeccakCodeHash = emptyKeccakCodeHash
+				data.PoseidonCodeHash = emptyPoseidonCodeHash
+				data.CodeSize = 0
 			}
 			if data.Root == (common.Hash{}) {
 				data.Root = s.db.TrieDB().EmptyRoot()
@@ -1052,7 +1064,7 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 		if obj := s.stateObjects[addr]; !obj.deleted {
 			// Write any contract code associated with the state object
 			if obj.code != nil && obj.dirtyCode {
-				rawdb.WriteCode(codeWriter, common.BytesToHash(obj.CodeHash()), obj.code)
+				rawdb.WriteCode(codeWriter, common.BytesToHash(obj.KeccakCodeHash()), obj.code)
 				obj.dirtyCode = false
 			}
 			// Write any storage changes in the state object to its storage trie

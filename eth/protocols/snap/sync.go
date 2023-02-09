@@ -36,6 +36,7 @@ import (
 	"github.com/iswallet/go-ethereum/core/state/snapshot"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/event"
 	"github.com/iswallet/go-ethereum/light"
@@ -44,6 +45,17 @@ import (
 	"github.com/iswallet/go-ethereum/rlp"
 	"github.com/iswallet/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
+)
+
+var (
+	// emptyRoot is the known root hash of an empty trie.
+	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+
+	// emptyKeccakCodeHash is the known keccak hash of the empty EVM bytecode.
+	emptyKeccakCodeHash = codehash.EmptyKeccakCodeHash
+
+	// emptyPoseidonCodeHash is the known poseidon hash of the empty EVM bytecode.
+	emptyPoseidonCodeHash = codehash.EmptyPoseidonCodeHash
 )
 
 const (
@@ -1825,9 +1837,9 @@ func (s *Syncer) processAccountResponse(res *accountResponse) {
 	res.task.pend = 0
 	for i, account := range res.accounts {
 		// Check if the account is a contract with an unknown code
-		if !bytes.Equal(account.CodeHash, types.EmptyCodeHash.Bytes()) {
-			if !rawdb.HasCodeWithPrefix(s.db, common.BytesToHash(account.CodeHash)) {
-				res.task.codeTasks[common.BytesToHash(account.CodeHash)] = struct{}{}
+		if !bytes.Equal(account.KeccakCodeHash, emptyKeccakCodeHash[:]) {
+			if !rawdb.HasCodeWithPrefix(s.db, common.BytesToHash(account.KeccakCodeHash)) {
+				res.task.codeTasks[common.BytesToHash(account.KeccakCodeHash)] = struct{}{}
 				res.task.needCode[i] = true
 				res.task.pend++
 			}
@@ -1891,7 +1903,7 @@ func (s *Syncer) processBytecodeResponse(res *bytecodeResponse) {
 		}
 		// Code was delivered, mark it not needed any more
 		for j, account := range res.task.res.accounts {
-			if res.task.needCode[j] && hash == common.BytesToHash(account.CodeHash) {
+			if res.task.needCode[j] && hash == common.BytesToHash(account.KeccakCodeHash) {
 				res.task.needCode[j] = false
 				res.task.pend--
 			}
@@ -2277,7 +2289,7 @@ func (s *Syncer) forwardAccountTask(task *accountTask) {
 		if task.needCode[i] || task.needState[i] {
 			break
 		}
-		slim := snapshot.SlimAccountRLP(res.accounts[i].Nonce, res.accounts[i].Balance, res.accounts[i].Root, res.accounts[i].CodeHash)
+		slim := snapshot.SlimAccountRLP(res.accounts[i].Nonce, res.accounts[i].Balance, res.accounts[i].Root, res.accounts[i].KeccakCodeHash, res.accounts[i].PoseidonCodeHash, res.accounts[i].CodeSize)
 		rawdb.WriteAccountSnapshot(batch, hash, slim)
 
 		// If the task is complete, drop it into the stack trie to generate
@@ -2902,7 +2914,7 @@ func (s *Syncer) onHealState(paths [][]byte, value []byte) error {
 		if err := rlp.DecodeBytes(value, &account); err != nil {
 			return nil // Returning the error here would drop the remote peer
 		}
-		blob := snapshot.SlimAccountRLP(account.Nonce, account.Balance, account.Root, account.CodeHash)
+		blob := snapshot.SlimAccountRLP(account.Nonce, account.Balance, account.Root, account.KeccakCodeHash, account.PoseidonCodeHash, account.CodeSize)
 		rawdb.WriteAccountSnapshot(s.stateWriter, common.BytesToHash(paths[0]), blob)
 		s.accountHealed += 1
 		s.accountHealedBytes += common.StorageSize(1 + common.HashLength + len(blob))

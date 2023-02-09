@@ -49,7 +49,7 @@ func NewStateSync(root common.Hash, database ethdb.KeyValueReader, onLeaf func(k
 			return err
 		}
 		syncer.AddSubTrie(obj.Root, path, parent, parentPath, onSlot)
-		syncer.AddCodeEntry(common.BytesToHash(obj.CodeHash), path, parent, parentPath)
+		syncer.AddCodeEntry(common.BytesToHash(obj.KeccakCodeHash), path, parent, parentPath)
 		return nil
 	}
 	syncer = trie.NewSync(root, database, onAccount, scheme)

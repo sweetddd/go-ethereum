@@ -27,6 +27,7 @@ import (
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/common/hexutil"
 	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/log"
@@ -35,6 +36,13 @@ import (
 )
 
 var (
+	// emptyRoot is the known root hash of an empty trie.
+	emptyRoot = common.HexToHash("56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421")
+
+	// emptyPoseidonCode is the known hash of the empty EVM bytecode.
+	emptyPoseidonCode = codehash.EmptyPoseidonCodeHash
+	emptyKeccakCode   = codehash.EmptyKeccakCodeHash
+
 	// accountCheckRange is the upper limit of the number of accounts involved in
 	// each range check. This is a value estimated based on experience. If this
 	// range is too large, the failure rate of range proof will increase. Otherwise,
@@ -573,10 +581,12 @@ func generateAccounts(ctx *generatorContext, dl *diskLayer, accMarker []byte) er
 		}
 		// Retrieve the current account and flatten it into the internal format
 		var acc struct {
-			Nonce    uint64
-			Balance  *big.Int
-			Root     common.Hash
-			CodeHash []byte
+			Nonce            uint64
+			Balance          *big.Int
+			Root             common.Hash
+			KeccakCodeHash   []byte
+			PoseidonCodeHash []byte
+			CodeSize         uint64
 		}
 		if err := rlp.DecodeBytes(val, &acc); err != nil {
 			log.Crit("Invalid account encountered during snapshot creation", "err", err)
@@ -585,7 +595,7 @@ func generateAccounts(ctx *generatorContext, dl *diskLayer, accMarker []byte) er
 		if accMarker == nil || !bytes.Equal(account[:], accMarker) {
 			dataLen := len(val) // Approximate size, saves us a round of RLP-encoding
 			if !write {
-				if bytes.Equal(acc.CodeHash, types.EmptyCodeHash[:]) {
+				if bytes.Equal(acc.KeccakCodeHash, emptyKeccakCode[:]) {
 					dataLen -= 32
 				}
 				if acc.Root == types.EmptyRootHash {
@@ -593,7 +603,7 @@ func generateAccounts(ctx *generatorContext, dl *diskLayer, accMarker []byte) er
 				}
 				snapRecoveredAccountMeter.Mark(1)
 			} else {
-				data := SlimAccountRLP(acc.Nonce, acc.Balance, acc.Root, acc.CodeHash)
+				data := SlimAccountRLP(acc.Nonce, acc.Balance, acc.Root, acc.KeccakCodeHash, acc.PoseidonCodeHash, acc.CodeSize)
 				dataLen = len(data)
 				rawdb.WriteAccountSnapshot(ctx.batch, account, data)
 				snapGeneratedAccountMeter.Mark(1)

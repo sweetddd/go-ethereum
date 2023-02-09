@@ -454,8 +454,8 @@ func extractGenesis(db ethdb.Database, stateBloom *stateBloom) error {
 					return storageIter.Error()
 				}
 			}
-			if !bytes.Equal(acc.CodeHash, types.EmptyCodeHash.Bytes()) {
-				stateBloom.Put(acc.CodeHash, nil)
+			if !bytes.Equal(acc.KeccakCodeHash, emptyKeccakCodeHash) {
+				stateBloom.Put(acc.KeccakCodeHash, nil)
 			}
 		}
 	}
