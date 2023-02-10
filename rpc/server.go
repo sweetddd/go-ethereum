@@ -17,7 +17,9 @@
 package rpc
 
 import (
+	"compress/flate"
 	"context"
+	"errors"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -45,9 +47,10 @@ const (
 type Server struct {
 	services serviceRegistry
 	idgen    func() ID
-
 	mutex  sync.Mutex
 	codecs map[ServerCodec]struct{}
+	// Add compressionLevel inorder to enable set it when open websocket server.
+	compressionLevel int
 	run    int32
 }
 
@@ -107,6 +110,15 @@ func (s *Server) untrackCodec(codec ServerCodec) {
 	defer s.mutex.Unlock()
 
 	delete(s.codecs, codec)
+}
+
+// SetCompressionLevel set compression level (-2 ~ 9), this function only works on websocket.
+func (s *Server) SetCompressionLevel(level int) error {
+	if !(flate.HuffmanOnly <= level && level <= flate.BestCompression) {
+		return errors.New("websocket: invalid compression level")
+	}
+	s.compressionLevel = level
+	return nil
 }
 
 // serveSingleRequest reads and processes a single RPC request from the given codec. This
