@@ -55,6 +55,10 @@ func (v *BlockValidator) ValidateBody(block *types.Block) error {
 		return ErrKnownBlock
 	}
 
+	if !v.config.IsValidTxCount(len(block.Transactions())) {
+		return consensus.ErrInvalidTxCount
+	}
+
 	// Header validity is known at this point. Here we verify that uncles, transactions
 	// and withdrawals given in the block body match the header.
 	header := block.Header()

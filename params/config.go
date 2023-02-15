@@ -255,6 +255,7 @@ var (
 		FeeVaultAddress: 			   nil,
 		EnableEIP1559: true,
 		EnableEIP2718: true,
+		MaxTxPerBlock: nil,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -289,6 +290,7 @@ var (
 		FeeVaultAddress: nil,
 		EnableEIP2718: true,
 		EnableEIP1559: true,
+		MaxTxPerBlock: nil,
 	}
 
 	// TestChainConfig contains every protocol change (EIPs) introduced
@@ -322,6 +324,7 @@ var (
 		FeeVaultAddress: &common.Address{123},
 		EnableEIP1559: true,
 		EnableEIP2718: true,
+		MaxTxPerBlock: nil,
 	}
 
 	// NonActivatedConfig defines the chain configuration without activating
@@ -474,6 +477,9 @@ type ChainConfig struct {
 
 	// Scroll genesis extension: enable EIP-1559 in tx pool, EnableEIP2718 should be true too.
 	EnableEIP1559 bool `json:"enableEIP1559,omitempty"`
+
+	// Scroll genesis extension: Maximum number of transactions per block [optional]
+	MaxTxPerBlock *int `json:"maxTxPerBlock,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
@@ -677,6 +683,11 @@ func (c *ChainConfig) IsCancun(time uint64) bool {
 // IsPrague returns whether num is either equal to the Prague fork time or greater.
 func (c *ChainConfig) IsPrague(time uint64) bool {
 	return isTimestampForked(c.PragueTime, time)
+}
+
+// IsValidTxCount returns whether the given block's transaction count is below the limit.
+func (c *ChainConfig) IsValidTxCount(count int) bool {
+	return c.MaxTxPerBlock == nil || count <= *c.MaxTxPerBlock
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
