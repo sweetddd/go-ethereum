@@ -256,6 +256,7 @@ var (
 		EnableEIP1559: true,
 		EnableEIP2718: true,
 		MaxTxPerBlock: nil,
+		UsingScroll: true,
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -325,6 +326,7 @@ var (
 		EnableEIP1559: true,
 		EnableEIP2718: true,
 		MaxTxPerBlock: nil,
+		UsingScroll: true,
 	}
 
 	// NonActivatedConfig defines the chain configuration without activating
@@ -356,6 +358,7 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		Zktrie: 					   false,
+		UsingScroll: true,
 	}
 	TestRules = TestChainConfig.Rules(new(big.Int), false, 0)
 )
@@ -480,6 +483,10 @@ type ChainConfig struct {
 
 	// Scroll genesis extension: Maximum number of transactions per block [optional]
 	MaxTxPerBlock *int `json:"maxTxPerBlock,omitempty"`
+
+	// Scroll genesis extension: enable scroll rollup-related traces & state transition
+	// TODO: merge with these config: Zktrie, FeeVaultAddress, EnableEIP2718, EnableEIP1559 & MaxTxPerBlock
+	UsingScroll bool `json:"usingScroll,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
