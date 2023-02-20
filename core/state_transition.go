@@ -25,8 +25,12 @@ import (
 	cmath "github.com/iswallet/go-ethereum/common/math"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/core/vm"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/params"
 )
+
+var emptyKeccakCodeHash = codehash.EmptyKeccakCodeHash
+
 
 // ExecutionResult includes all output after executing given evm
 // message no matter the execution itself is successful or not.
@@ -205,15 +209,24 @@ type StateTransition struct {
 	initialGas   uint64
 	state        vm.StateDB
 	evm          *vm.EVM
+	// l1 rollup fee
+	l1Fee *big.Int
 }
 
 // NewStateTransition initialises and returns a new state transition object.
 func NewStateTransition(evm *vm.EVM, msg *Message, gp *GasPool) *StateTransition {
+
+	l1Fee := new(big.Int)
+	if evm.ChainConfig().UsingScroll {
+		l1Fee, _ = fees.CalculateL1MsgFee(msg, evm.StateDB)
+	}
+
 	return &StateTransition{
 		gp:    gp,
 		evm:   evm,
 		msg:   msg,
 		state: evm.StateDB,
+		l1Fee:     l1Fee,
 	}
 }
 
@@ -228,6 +241,12 @@ func (st *StateTransition) to() common.Address {
 func (st *StateTransition) buyGas() error {
 	mgval := new(big.Int).SetUint64(st.msg.GasLimit)
 	mgval = mgval.Mul(mgval, st.msg.GasPrice)
+
+	if st.evm.ChainConfig().UsingScroll {
+		// always add l1fee, because all tx are L2-to-L1 ATM
+		mgval = mgval.Add(mgval, st.l1Fee)
+	}
+
 	balanceCheck := mgval
 	if st.msg.GasFeeCap != nil {
 		balanceCheck = new(big.Int).SetUint64(st.msg.GasLimit)
@@ -395,6 +414,17 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 		fee := new(big.Int).SetUint64(st.gasUsed())
 		fee.Mul(fee, effectiveTip)
 		st.state.AddBalance(st.evm.FeeRecipient(), fee)
+	}
+
+	if st.evm.ChainConfig().UsingScroll {
+		// The L2 Fee is the same as the fee that is charged in the normal geth
+		// codepath. Add the L1 fee to the L2 fee for the total fee that is sent
+		// to the sequencer.
+		l2Fee := new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip)
+		fee := new(big.Int).Add(st.l1Fee, l2Fee)
+		st.state.AddBalance(st.evm.FeeRecipient(), fee)
+	} else {
+		st.state.AddBalance(st.evm.FeeRecipient(), new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), effectiveTip))
 	}
 
 	return &ExecutionResult{
