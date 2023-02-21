@@ -39,8 +39,12 @@ func VerifyEip1559Header(config *params.ChainConfig, parent, header *types.Heade
 		return err
 	}
 	// Verify the header is not malformed
-	if header.BaseFee == nil {
+	if header.BaseFee == nil && (config.EnableEIP2718 && config.EnableEIP1559) {
 		return fmt.Errorf("header is missing baseFee")
+	}
+	// Now BaseFee can be nil, because !(config.EnableEIP2718 && config.EnableEIP1559)
+	if header.BaseFee == nil {
+		return nil
 	}
 	// Verify the baseFee is correct based on the parent header.
 
@@ -77,6 +81,10 @@ func CalcBaseFee(config *params.ChainConfig, parent *types.Header) *big.Int {
 		num   = new(big.Int)
 		denom = new(big.Int)
 	)
+
+	if !config.EnableEIP2718 || !config.EnableEIP1559 {
+		return nil
+	}
 
 	if parent.GasUsed > parentGasTarget {
 		// If the parent block used more gas than its target, the baseFee should increase.
