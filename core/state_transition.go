@@ -244,6 +244,7 @@ func (st *StateTransition) buyGas() error {
 
 	if st.evm.ChainConfig().UsingScroll {
 		// always add l1fee, because all tx are L2-to-L1 ATM
+		log.Debug("Adding L1 fee", "l1_fee", st.l1Fee)
 		mgval = mgval.Add(mgval, st.l1Fee)
 	}
 
@@ -252,6 +253,10 @@ func (st *StateTransition) buyGas() error {
 		balanceCheck = new(big.Int).SetUint64(st.msg.GasLimit)
 		balanceCheck = balanceCheck.Mul(balanceCheck, st.msg.GasFeeCap)
 		balanceCheck.Add(balanceCheck, st.msg.Value)
+		if st.evm.ChainConfig().UsingScroll {
+			// always add l1fee, because all tx are L2-to-L1 ATM
+			balanceCheck.Add(balanceCheck, st.l1Fee)
+		}
 	}
 	if have, want := st.state.GetBalance(st.msg.From), balanceCheck; have.Cmp(want) < 0 {
 		return fmt.Errorf("%w: address %v have %v want %v", ErrInsufficientFunds, st.msg.From.Hex(), have, want)
