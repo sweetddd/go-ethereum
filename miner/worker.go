@@ -1215,6 +1215,12 @@ func (w *worker) commitWork(interrupt *int32, noempty bool, timestamp int64) {
 		work.discard()
 		return
 	}
+
+	// do not produce empty blocks
+	if w.current.tcount == 0 {
+		return
+	}
+
 	// Submit the generated block for consensus sealing.
 	w.commit(work.copy(), w.fullTaskHook, true, start)
 
