@@ -35,6 +35,8 @@ import (
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/metrics"
 	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rollup/fees"
+
 )
 
 const (
@@ -710,6 +712,14 @@ func (pool *TxPool) add(tx *types.Transaction, local bool) (replaced bool, err e
 	// Make the local flag. If it's from local source or it's from the network but
 	// the sender is marked as local previously, treat it as the local transaction.
 	isLocal := local || pool.locals.containsTx(tx)
+
+	if pool.chainconfig.UsingScroll {
+		if err := fees.VerifyFee(pool.signer, tx, pool.currentState); err != nil {
+			log.Trace("Discarding insufficient l1fee transaction", "hash", hash, "err", err)
+			invalidTxMeter.Mark(1)
+			return false, err
+		}
+	}
 
 	// If the transaction fails basic validation, discard it
 	if err := pool.validateTx(tx, isLocal); err != nil {

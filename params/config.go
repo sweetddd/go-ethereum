@@ -361,6 +361,40 @@ var (
 		UsingScroll: true,
 	}
 	TestRules = TestChainConfig.Rules(new(big.Int), false, 0)
+	// and accepted by the Ethereum core developers for testing proposes.
+	TestNoL1feeChainConfig = &ChainConfig{
+		ChainID:                       big.NewInt(1),
+		HomesteadBlock:                big.NewInt(0),
+		DAOForkBlock:                  nil,
+		DAOForkSupport:                false,
+		EIP150Block:                   big.NewInt(0),
+		EIP150Hash:                    common.Hash{},
+		EIP155Block:                   big.NewInt(0),
+		EIP158Block:                   big.NewInt(0),
+		ByzantiumBlock:                big.NewInt(0),
+		ConstantinopleBlock:           big.NewInt(0),
+		PetersburgBlock:               big.NewInt(0),
+		IstanbulBlock:                 big.NewInt(0),
+		MuirGlacierBlock:              big.NewInt(0),
+		BerlinBlock:                   big.NewInt(0),
+		LondonBlock:                   big.NewInt(0),
+		ArrowGlacierBlock:             big.NewInt(0),
+		GrayGlacierBlock:              big.NewInt(0),
+		MergeNetsplitBlock:            nil,
+		ShanghaiTime:                  nil,
+		CancunTime:                    nil,
+		PragueTime:                    nil,
+		TerminalTotalDifficulty:       nil,
+		TerminalTotalDifficultyPassed: false,
+		Ethash:                        new(EthashConfig),
+		Clique:                        nil,
+		Zktrie: false,
+		FeeVaultAddress: &common.Address{123},
+		EnableEIP1559: true,
+		EnableEIP2718: true,
+		MaxTxPerBlock: nil,
+		UsingScroll: false,
+	}
 )
 
 // NetworkNames are user friendly names to use in the chain spec banner.
