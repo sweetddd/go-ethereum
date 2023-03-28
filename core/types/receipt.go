@@ -72,6 +72,9 @@ type Receipt struct {
 
 	// The value of evm execution result.
 	ReturnValue []byte `json:"returnValue,omitempty"`
+
+	// Scroll rollup
+	L1Fee *big.Int `json:"l1Fee,omitempty" gencodec:"required"`
 }
 
 type receiptMarshaling struct {
@@ -97,6 +100,14 @@ type storedReceiptRLP struct {
 	PostStateOrStatus []byte
 	CumulativeGasUsed uint64
 	Logs              []*Log
+	L1Fee             *big.Int
+}
+
+// v5StoredReceiptRLP is the storage encoding of a receipt used in database version 5.
+type v5StoredReceiptRLP struct {
+	PostStateOrStatus []byte
+	CumulativeGasUsed uint64
+	Logs              []*LogForStorage
 }
 
 // NewReceipt creates a barebone transaction receipt, copying the init fields.
@@ -283,6 +294,24 @@ func (r *ReceiptForStorage) DecodeRLP(s *rlp.Stream) error {
 	}
 	r.CumulativeGasUsed = stored.CumulativeGasUsed
 	r.Logs = stored.Logs
+	r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
+
+	return nil
+}
+
+func decodeV5StoredReceiptRLP(r *ReceiptForStorage, blob []byte) error {
+	var stored v5StoredReceiptRLP
+	if err := rlp.DecodeBytes(blob, &stored); err != nil {
+		return err
+	}
+	if err := (*Receipt)(r).setStatus(stored.PostStateOrStatus); err != nil {
+		return err
+	}
+	r.CumulativeGasUsed = stored.CumulativeGasUsed
+	r.Logs = make([]*Log, len(stored.Logs))
+	for i, log := range stored.Logs {
+		r.Logs[i] = (*Log)(log)
+	}
 	r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
 
 	return nil
