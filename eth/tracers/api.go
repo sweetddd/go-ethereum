@@ -985,6 +985,16 @@ func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Conte
 	}()
 	defer cancel()
 
+	// If gasPrice is 0, make sure that the account has sufficient balance to cover `l1Fee`.
+	if api.backend.ChainConfig().UsingScroll && message.GasPrice().Cmp(big.NewInt(0)) == 0 {
+		l1Fee, err := fees.CalculateL1MsgFee(message, vmenv.StateDB)
+		if err != nil {
+			return nil, err
+		}
+
+		statedb.AddBalance(message.From(), l1Fee)
+	}
+
 	// Call Prepare to clear out the statedb access list
 	statedb.SetTxContext(txctx.TxHash, txctx.TxIndex)
 	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit)); err != nil {

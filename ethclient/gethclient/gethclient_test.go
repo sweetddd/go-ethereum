@@ -42,6 +42,8 @@ var (
 	testAddr    = crypto.PubkeyToAddress(testKey.PublicKey)
 	testSlot    = common.HexToHash("0xdeadbeef")
 	testValue   = crypto.Keccak256Hash(testSlot[:])
+	emptyAccountKey, _ = crypto.HexToECDSA("b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f292")
+	emptyAddr          = crypto.PubkeyToAddress(emptyAccountKey.PublicKey)
 	testBalance = big.NewInt(2e15)
 )
 
@@ -126,6 +128,9 @@ func TestGethClient(t *testing.T) {
 		}, {
 			"TestCallContract",
 			func(t *testing.T) { testCallContract(t, client) },
+		}, {
+			"TestCallContractNoGas",
+			func(t *testing.T) { testCallContractNoGas(t, client) },
 		},
 		// The testaccesslist is a bit time-sensitive: the newTestBackend imports
 		// one block. The `testAcessList` fails if the miner has not yet created a
@@ -410,5 +415,22 @@ func TestOverrideAccountMarshal(t *testing.T) {
 	if string(marshalled) != expected {
 		t.Error("wrong output:", string(marshalled))
 		t.Error("want:", expected)
+	}
+}
+
+func testCallContractNoGas(t *testing.T, client *rpc.Client) {
+	ec := New(client)
+	msg := ethereum.CallMsg{
+		From:     emptyAddr, // 0 balance
+		To:       &common.Address{},
+		Gas:      21000,
+		GasPrice: big.NewInt(0), // gas price 0
+		Value:    big.NewInt(0),
+	}
+
+	// this would fail with `insufficient funds for gas * price + value`
+	// before we started considering l1fee for 0 gas calls.
+	if _, err := ec.CallContract(context.Background(), msg, big.NewInt(0), nil); err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
