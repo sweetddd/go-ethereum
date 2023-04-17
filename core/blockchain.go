@@ -258,13 +258,13 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 	log.Info(strings.Repeat("-", 153))
 	log.Info("")
 	// override snapshot setting
-	if chainConfig.Zktrie && cacheConfig.SnapshotLimit > 0 {
+	if chainConfig.Scroll.ZktrieEnabled() && cacheConfig.SnapshotLimit > 0 {
 		log.Warn("Snapshot has been disabled by zktrie")
 		cacheConfig.SnapshotLimit = 0
 	}
 
-	if chainConfig.FeeVaultAddress != nil {
-		log.Warn("Using fee vault address", "FeeVaultAddress", *chainConfig.FeeVaultAddress)
+	if chainConfig.Scroll.L1FeeEnabled() {
+		log.Warn("Using fee vault address", "FeeVaultAddress", *chainConfig.Scroll.FeeVaultAddress)
 	}
 
 	bc := &BlockChain{
@@ -274,6 +274,12 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		triedb:        triedb,
 		flushInterval: int64(cacheConfig.TrieTimeLimit),
 		triegc:        prque.New[int64, common.Hash](nil),
+		stateCache: state.NewDatabaseWithConfig(db, &trie.Config{
+			Cache:     cacheConfig.TrieCleanLimit,
+			Journal:   cacheConfig.TrieCleanJournal,
+			Preimages: cacheConfig.Preimages,
+			Zktrie:    chainConfig.Scroll.ZktrieEnabled(),
+		}),
 		quit:          make(chan struct{}),
 		chainmu:       syncx.NewClosableMutex(),
 		bodyCache:     lru.NewCache[common.Hash, *types.Body](bodyCacheLimit),

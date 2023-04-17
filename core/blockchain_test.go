@@ -3883,7 +3883,7 @@ func TestFeeVault(t *testing.T) {
 	}
 
 	// Ensure that the fee vault received all tx fees
-	actual = state.GetBalance(*params.TestChainConfig.FeeVaultAddress)
+	actual = state.GetBalance(*params.TestChainConfig.Scroll.FeeVaultAddress)
 	expected = new(big.Int).SetUint64(block.GasUsed() * block.Transactions()[0].GasTipCap().Uint64())
 
 	if actual.Cmp(expected) != 0 {
@@ -4582,8 +4582,8 @@ func TestEIP3651(t *testing.T) {
 func TestTransactionCountLimit(t *testing.T) {
 	// Create config that allows at most 1 transaction per block
 	config := params.TestChainConfig
-	config.MaxTxPerBlock = new(int)
-	*config.MaxTxPerBlock = 1
+	config.Scroll.MaxTxPerBlock = new(int)
+	*config.Scroll.MaxTxPerBlock = 1
 
 	var (
 		engine  = ethash.NewFaker()

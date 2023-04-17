@@ -55,7 +55,7 @@ func (v *BlockValidator) ValidateBody(block *types.Block) error {
 		return ErrKnownBlock
 	}
 
-	if !v.config.IsValidTxCount(len(block.Transactions())) {
+	if !v.config.Scroll.IsValidTxCount(len(block.Transactions())) {
 		return consensus.ErrInvalidTxCount
 	}
 

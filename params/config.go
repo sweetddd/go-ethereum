@@ -251,12 +251,13 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
-		Zktrie: 					   false,
-		FeeVaultAddress: 			   nil,
-		EnableEIP1559: true,
-		EnableEIP2718: true,
-		MaxTxPerBlock: nil,
-		UsingScroll: true,
+		Scroll: ScrollConfig{
+			UseZktrie:       false,
+			FeeVaultAddress: nil,
+			EnableEIP2718:   true,
+			EnableEIP1559:   true,
+			MaxTxPerBlock:   nil,
+		},
 	}
 
 	// AllCliqueProtocolChanges contains every protocol change (EIPs) introduced
@@ -287,11 +288,13 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        nil,
 		Clique:                        &CliqueConfig{Period: 0, Epoch: 30000},
-		Zktrie: 					   false,
-		FeeVaultAddress: nil,
-		EnableEIP2718: true,
-		EnableEIP1559: true,
-		MaxTxPerBlock: nil,
+		Scroll: ScrollConfig{
+			UseZktrie:       false,
+			FeeVaultAddress: nil,
+			EnableEIP2718:   true,
+			EnableEIP1559:   true,
+			MaxTxPerBlock:   nil,
+		},
 	}
 
 	// TestChainConfig contains every protocol change (EIPs) introduced
@@ -322,11 +325,13 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
-		FeeVaultAddress: &common.Address{123},
-		EnableEIP1559: true,
-		EnableEIP2718: true,
-		MaxTxPerBlock: nil,
-		UsingScroll: true,
+		Scroll: ScrollConfig{
+			UseZktrie:       false,
+			FeeVaultAddress: &common.Address{123},
+			EnableEIP2718:   true,
+			EnableEIP1559:   true,
+			MaxTxPerBlock:   nil,
+		},
 	}
 
 	// NonActivatedConfig defines the chain configuration without activating
@@ -357,8 +362,6 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
-		Zktrie: 					   false,
-		UsingScroll: true,
 	}
 	TestRules = TestChainConfig.Rules(new(big.Int), false, 0)
 	// and accepted by the Ethereum core developers for testing proposes.
@@ -388,12 +391,13 @@ var (
 		TerminalTotalDifficultyPassed: false,
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
-		Zktrie: false,
-		FeeVaultAddress: &common.Address{123},
-		EnableEIP1559: true,
-		EnableEIP2718: true,
-		MaxTxPerBlock: nil,
-		UsingScroll: false,
+		Scroll: ScrollConfig{
+			UseZktrie:       false,
+			FeeVaultAddress: nil,
+			EnableEIP2718:   true,
+			EnableEIP1559:   true,
+			MaxTxPerBlock:   nil,
+		},
 	}
 )
 
@@ -503,24 +507,42 @@ type ChainConfig struct {
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
-	// Scroll genesis extension: Use zktrie
-	Zktrie bool `json:"zktrie,omitempty"`
+	// Scroll genesis extension: enable scroll rollup-related traces & state transition
+	Scroll ScrollConfig `json:"scroll,omitempty"`
+}
 
-	// Scroll genesis extension: Transaction fee vault address [optional]
-	FeeVaultAddress *common.Address `json:"feeVaultAddress,omitempty"`
+type ScrollConfig struct {
+	// Use zktrie [optional]
+	UseZktrie bool `json:"useZktrie,omitempty"`
 
-	// Scroll genesis extension: enable EIP-2718 in tx pool.
-	EnableEIP2718 bool `json:"enableEIP2718,omitempty"`
-
-	// Scroll genesis extension: enable EIP-1559 in tx pool, EnableEIP2718 should be true too.
-	EnableEIP1559 bool `json:"enableEIP1559,omitempty"`
-
-	// Scroll genesis extension: Maximum number of transactions per block [optional]
+	// Maximum number of transactions per block [optional]
 	MaxTxPerBlock *int `json:"maxTxPerBlock,omitempty"`
 
-	// Scroll genesis extension: enable scroll rollup-related traces & state transition
-	// TODO: merge with these config: Zktrie, FeeVaultAddress, EnableEIP2718, EnableEIP1559 & MaxTxPerBlock
-	UsingScroll bool `json:"usingScroll,omitempty"`
+	// Transaction fee vault address [optional]
+	FeeVaultAddress *common.Address `json:"feeVaultAddress,omitempty"`
+
+	// Enable EIP-2718 in tx pool [optional]
+	EnableEIP2718 bool `json:"enableEIP2718,omitempty"`
+
+	// Enable EIP-1559 in tx pool, EnableEIP2718 should be true too [optional]
+	EnableEIP1559 bool `json:"enableEIP1559,omitempty"`
+}
+
+func (s ScrollConfig) BaseFeeEnabled() bool {
+	return s.EnableEIP2718 && s.EnableEIP1559
+}
+
+func (s ScrollConfig) L1FeeEnabled() bool {
+	return s.FeeVaultAddress != nil
+}
+
+func (s ScrollConfig) ZktrieEnabled() bool {
+	return s.UseZktrie
+}
+
+// IsValidTxCount returns whether the given block's transaction count is below the limit.
+func (s ScrollConfig) IsValidTxCount(count int) bool {
+	return s.MaxTxPerBlock == nil || count <= *s.MaxTxPerBlock
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
