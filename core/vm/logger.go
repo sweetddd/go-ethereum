@@ -24,8 +24,7 @@ import (
 	"github.com/iswallet/go-ethereum/common"
 )
 
-<<<<<<< HEAD
-=======
+
 // Storage represents a contract's storage.
 type Storage map[common.Hash]common.Hash
 
@@ -70,26 +69,15 @@ type StructLog struct {
 	Err           error                       `json:"-"`
 }
 
-var (
-	loggerPool = sync.Pool{
-		New: func() interface{} {
-			return &StructLog{
-				// init arrays here; other types are inited with default values
-				Stack: make([]uint256.Int, 0),
-			}
-		},
-	}
-)
-
 func NewStructlog(pc uint64, op OpCode, gas, cost uint64, depth int, err error) *StructLog {
-	structlog := loggerPool.Get().(*StructLog)
-	structlog.Pc, structlog.Op, structlog.Gas, structlog.GasCost, structlog.Depth, structlog.Err = pc, op, gas, cost, depth, err
-
-	runtime.SetFinalizer(structlog, func(logger *StructLog) {
-		logger.clean()
-		loggerPool.Put(logger)
-	})
-	return structlog
+	return &StructLog{
+		Pc:      pc,
+		Op:      op,
+		Gas:     gas,
+		GasCost: cost,
+		Depth:   depth,
+		Err:     err,
+	}
 }
 
 func (s *StructLog) clean() {
@@ -220,6 +208,7 @@ func NewStructLogger(cfg *LogConfig) *StructLogger {
 	if cfg != nil {
 		logger.cfg = *cfg
 	}
+
 	return logger
 }
 
@@ -260,7 +249,7 @@ func (l *StructLogger) CaptureState(pc uint64, op OpCode, gas, cost uint64, scop
 	stack := scope.Stack
 	contract := scope.Contract
 	// create a struct log.
-	structlog := NewStructlog(pc, op, gas, cost, depth, opErr)
+	structLog := NewStructlog(pc, op, gas, cost, depth, opErr)
 
 	// check if already accumulated the specified number of logs
 	if l.cfg.Limit != 0 && l.cfg.Limit <= len(l.logs) {
@@ -268,12 +257,12 @@ func (l *StructLogger) CaptureState(pc uint64, op OpCode, gas, cost uint64, scop
 	}
 	// Copy a snapshot of the current memory state to a new buffer
 	if l.cfg.EnableMemory {
-		structlog.Memory.Write(memory.Data())
-		structlog.MemorySize = memory.Len()
+		structLog.Memory.Write(memory.Data())
+		structLog.MemorySize = memory.Len()
 	}
 	// Copy a snapshot of the current stack state to a new buffer
 	if !l.cfg.DisableStack {
-		structlog.Stack = append(structlog.Stack, stack.Data()...)
+		structLog.Stack = append(structLog.Stack, stack.Data()...)
 	}
 	var (
 		recordStorageDetail bool
@@ -297,20 +286,20 @@ func (l *StructLogger) CaptureState(pc uint64, op OpCode, gas, cost uint64, scop
 			l.storage[contractAddress] = make(Storage)
 		}
 		l.storage[contractAddress][storageKey] = storageValue
-		structlog.Storage = l.storage[contractAddress].Copy()
+		structLog.Storage = l.storage[contractAddress].Copy()
 
-		if err := traceStorage(l, scope, structlog.getOrInitExtraData()); err != nil {
+		if err := traceStorage(l, scope, structLog.getOrInitExtraData()); err != nil {
 			log.Error("Failed to trace data", "opcode", op.String(), "err", err)
 		}
 	}
 	if l.cfg.EnableReturnData {
-		structlog.ReturnData.Write(rData)
+		structLog.ReturnData.Write(rData)
 	}
 	execFuncList, ok := OpcodeExecs[op]
 	if ok {
 		// execute trace func list.
 		for _, exec := range execFuncList {
-			if err := exec(l, scope, structlog.getOrInitExtraData()); err != nil {
+			if err := exec(l, scope, structLog.getOrInitExtraData()); err != nil {
 				log.Error("Failed to trace data", "opcode", op.String(), "err", err)
 			}
 		}
@@ -318,12 +307,12 @@ func (l *StructLogger) CaptureState(pc uint64, op OpCode, gas, cost uint64, scop
 	// for each "calling" op, pick the caller's state
 	switch op {
 	case CALL, CALLCODE, STATICCALL, DELEGATECALL, CREATE, CREATE2:
-		extraData := structlog.getOrInitExtraData()
+		extraData := structLog.getOrInitExtraData()
 		extraData.Caller = append(extraData.Caller, getWrappedAccountForAddr(l, scope.Contract.Address()))
 	}
 
-	structlog.RefundCounter = l.env.StateDB.GetRefund()
-	l.logs = append(l.logs, structlog)
+	structLog.RefundCounter = l.env.StateDB.GetRefund()
+	l.logs = append(l.logs, structLog)
 }
 
 func (l *StructLogger) CaptureStateAfter(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error) {
@@ -370,7 +359,7 @@ func (l *StructLogger) CaptureEnter(typ OpCode, from common.Address, to common.A
 	}
 }
 
-// in CaptureExit phase, a CREATE has its target address's code being set and queryable
+// CaptureExit phase, a CREATE has its target address's code being set and queryable
 func (l *StructLogger) CaptureExit(output []byte, gasUsed uint64, err error) {
 	stackH := len(l.callStackLogInd)
 	if stackH == 0 {
@@ -556,7 +545,7 @@ func FormatLogs(logs []*StructLog) []*types.StructLogRes {
 		logRes := types.NewStructLogResBasic(trace.Pc, trace.Op.String(), trace.Gas, trace.GasCost, trace.Depth, trace.RefundCounter, trace.Err)
 		for _, stackValue := range trace.Stack {
 			logRes.Stack = append(logRes.Stack, stackValue.Hex())
->>>>>>> 9b99f2e17 (fix bug and optimize fill_trace logic for gc (#104))
+ 9b99f2e17 (fix bug and optimize fill_trace logic for gc (#104))
 		}
 		for i := 0; i+32 <= trace.Memory.Len(); i += 32 {
 			logRes.Memory = append(logRes.Memory, common.Bytes2Hex(trace.Memory.Bytes()[i:i+32]))
