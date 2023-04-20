@@ -14,10 +14,7 @@ archives are published at https://geth.ethereum.org/downloads/.
 
 ### ZKTrie Storage
 
-Another implement for storage trie, base on patricia merkle tree, has been induced. It is feasible to zk proving in the storage part. It is specified as a flag
-in gensis, set `config.zktrie` to true for enabling it. Using `genesis_zktrie.json` as an example to create a L2 chain with zktrie sotrage:
-
-> geth init \<repo root\>/genesis_zktrie.json
+Another implement for storage trie, base on patricia merkle tree, has been induced. It is feasible to zk proving in the storage part. It is specified as a flag in gensis, set `config.scroll.useZktrie` to true for enabling it.
 
 Notice current the snapshot would be disabled by the zktrie implement.
 

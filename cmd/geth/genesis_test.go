@@ -17,15 +17,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
-
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core"
 )
 
 var customGenesisTests = []struct {
@@ -71,35 +67,6 @@ var customGenesisTests = []struct {
 		query:  "eth.getBlock(0).nonce",
 		result: "0x0000000000001339",
 	},
-}
-
-func addCustomGenesis() error {
-	path, _ := os.Getwd()
-	buf, err := os.ReadFile(fmt.Sprintf("%s/%s", path[:len(path)-len("/cmd/geth")], "genesis.json"))
-	if err != nil {
-		return err
-	}
-	genesis := &core.Genesis{}
-	if err := json.Unmarshal(buf, genesis); err != nil {
-		return err
-	}
-	if len(genesis.Alloc) == 0 {
-		return nil
-	}
-	data := string(buf)
-	for addr, balance := range genesis.Alloc {
-		customGenesisTests = append(customGenesisTests, struct {
-			genesis string
-			query   string
-			result  string
-		}{
-			genesis: data,
-			query:   fmt.Sprintf("eth.getBalance('%s')", addr.String()),
-			result:  common.Bytes2Hex(balance.Balance.Bytes()),
-		})
-	}
-
-	return nil
 }
 
 // Tests that initializing Geth with a custom genesis block and chain definitions
