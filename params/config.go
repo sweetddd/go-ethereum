@@ -574,6 +574,16 @@ func (s ScrollConfig) ZktrieEnabled() bool {
 	return s.UseZktrie
 }
 
+func (s ScrollConfig) String() string {
+	if s.MaxTxPerBlock == nil {
+		return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: <nil>, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
+			s.UseZktrie, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
+	}
+
+	return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: %v, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
+		s.UseZktrie, *s.MaxTxPerBlock, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
+}
+
 // IsValidTxCount returns whether the given block's transaction count is below the limit.
 func (s ScrollConfig) IsValidTxCount(count int) bool {
 	return s.MaxTxPerBlock == nil || count <= *s.MaxTxPerBlock
@@ -653,6 +663,7 @@ func (c *ChainConfig) Description() string {
 	if c.ArrowGlacierBlock != nil {
 		banner += fmt.Sprintf(" - Arrow Glacier:               #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/arrow-glacier.md)\n", c.ArrowGlacierBlock)
 	}
+	banner+=fmt.Sprintf(" - Scroll config: %v \n",c.Scroll)
 	if c.GrayGlacierBlock != nil {
 		banner += fmt.Sprintf(" - Gray Glacier:                #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/gray-glacier.md)\n", c.GrayGlacierBlock)
 	}
@@ -684,6 +695,7 @@ func (c *ChainConfig) Description() string {
 	if c.PragueTime != nil {
 		banner += fmt.Sprintf(" - Prague:                      @%-10v\n", *c.PragueTime)
 	}
+
 	return banner
 }
 
