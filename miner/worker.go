@@ -94,6 +94,7 @@ type environment struct {
 	ancestors mapset.Set[common.Hash] // ancestor set (used for checking uncle parent validity)
 	family    mapset.Set[common.Hash] // family set (used for checking uncle invalidity)
 	tcount    int                     // tx count in cycle
+	blockSize common.StorageSize // approximate size of tx payload in bytes
 	gasPool   *core.GasPool           // available gas used to pack transactions
 	coinbase  common.Address
 
@@ -844,6 +845,7 @@ func (w *worker) makeEnv(parent *types.Header, header *types.Header, coinbase co
 	}
 	// Keep track of transactions which return errors so they can be removed
 	env.tcount = 0
+	env.blockSize = 0
 	return env, nil
 }
 
@@ -934,6 +936,10 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 		if tx == nil {
 			break
 		}
+		if !w.chainConfig.Scroll.IsValidBlockSize(w.current.blockSize + tx.Size()) {
+			log.Trace("Block size limit reached", "have", w.current.blockSize, "want", w.chainConfig.Scroll.MaxTxPayloadBytesPerBlock, "tx", tx.Size())
+			break
+		}
 		// Error may be ignored here. The error has already been checked
 		// during transaction acceptance is the transaction pool.
 		from, _ := types.Sender(env.signer, tx)
@@ -970,6 +976,8 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 			// Everything ok, collect the logs and shift in the next transaction from the same account
 			coalescedLogs = append(coalescedLogs, logs...)
 			env.tcount++
+			env.blockSize += tx.Size()
+
 			txs.Shift()
 
 		case errors.Is(err, types.ErrTxTypeNotSupported):
