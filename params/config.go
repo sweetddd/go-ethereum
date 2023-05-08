@@ -293,6 +293,7 @@ var (
 			EnableEIP2718:   true,
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
+			MaxTxPayloadBytesPerBlock: nil,
 		},
 	}
 
@@ -330,6 +331,7 @@ var (
 			EnableEIP2718:   true,
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
+			MaxTxPayloadBytesPerBlock: nil,
 		},
 	}
 
@@ -367,6 +369,7 @@ var (
 			EnableEIP2718:   true,
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
+			MaxTxPayloadBytesPerBlock: nil,
 		},
 	}
 
@@ -433,6 +436,7 @@ var (
 			EnableEIP2718:   true,
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
+			MaxTxPayloadBytesPerBlock: nil,
 		},
 	}
 )
@@ -580,13 +584,18 @@ func (s ScrollConfig) ZktrieEnabled() bool {
 }
 
 func (s ScrollConfig) String() string {
-	if s.MaxTxPerBlock == nil {
-		return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: <nil>, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
-			s.UseZktrie, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
+	maxTxPerBlock := "<nil>"
+	if s.MaxTxPerBlock != nil {
+		maxTxPerBlock = fmt.Sprintf("%v", *s.MaxTxPerBlock)
 	}
 
-	return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: %v, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
-		s.UseZktrie, *s.MaxTxPerBlock, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
+	maxTxPayloadBytesPerBlock := "<nil>"
+	if s.MaxTxPayloadBytesPerBlock != nil {
+		maxTxPayloadBytesPerBlock = fmt.Sprintf("%v", *s.MaxTxPayloadBytesPerBlock)
+	}
+
+	return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: %v, MaxTxPayloadBytesPerBlock: %v, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
+		s.UseZktrie, maxTxPerBlock, maxTxPayloadBytesPerBlock, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
 }
 
 // IsValidTxCount returns whether the given block's transaction count is below the limit.
