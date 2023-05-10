@@ -246,6 +246,7 @@ var (
 		LondonBlock:         big.NewInt(0),
 		ArrowGlacierBlock:   nil,
 		ArchimedesBlock:     nil,
+		ShanghaiBlock:       nil,
 		Clique: &CliqueConfig{
 			Period: 3,
 			Epoch:  30000,
@@ -280,6 +281,7 @@ var (
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
 		ArchimedesBlock: big.NewInt(0),
+		ShanghaiBlock: nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -319,6 +321,7 @@ var (
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             nil,
 		ArchimedesBlock: big.NewInt(0),
+		ShanghaiBlock: nil,
 		GrayGlacierBlock:              nil,
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -358,6 +361,7 @@ var (
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
 		ArchimedesBlock: big.NewInt(0),
+		ShanghaiBlock: nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -426,6 +430,7 @@ var (
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
 		ArchimedesBlock: big.NewInt(0),
+		ShanghaiBlock: nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -531,6 +536,7 @@ type ChainConfig struct {
 	LondonBlock         *big.Int `json:"londonBlock,omitempty"`         // London switch block (nil = no fork, 0 = already on london)
 	ArrowGlacierBlock   *big.Int `json:"arrowGlacierBlock,omitempty"`   // Eip-4345 (bomb delay) switch block (nil = no fork, 0 = already activated)
 	ArchimedesBlock     *big.Int `json:"ArchimedesBlock,omitempty"`     // Archimedes switch block (nil = no fork, 0 = already on archimedes)
+	ShanghaiBlock       *big.Int `json:"shanghaiBlock,omitempty"`       // Shanghai switch block (nil = no fork, 0 = already on shanghai)
 	GrayGlacierBlock    *big.Int `json:"grayGlacierBlock,omitempty"`    // Eip-5133 (bomb delay) switch block (nil = no fork, 0 = already activated)
 	MergeNetsplitBlock  *big.Int `json:"mergeNetsplitBlock,omitempty"`  // Virtual fork after The Merge to use as a network splitter
 
@@ -691,6 +697,9 @@ func (c *ChainConfig) Description() string {
 	if c.ArchimedesBlock != nil {
 		banner += fmt.Sprintf(" - Archimedes:               #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/Archimedes.md)\n", c.ArchimedesBlock)
 	}
+	if c.ShanghaiBlock != nil {
+		banner += fmt.Sprintf(" - Shanghai:               #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/Shanghai.md)\n", c.ShanghaiBlock)
+	}
 	banner+=fmt.Sprintf(" - Scroll config: %v \n",c.Scroll)
 	if c.GrayGlacierBlock != nil {
 		banner += fmt.Sprintf(" - Gray Glacier:                #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/gray-glacier.md)\n", c.GrayGlacierBlock)
@@ -799,8 +808,14 @@ func (c *ChainConfig) IsGrayGlacier(num *big.Int) bool {
 	return isBlockForked(c.GrayGlacierBlock, num)
 }
 
+// IsArchimedes returns whether num is either equal to the Archimedes fork block or greater.
 func (c *ChainConfig) IsArchimedes(num *big.Int) bool {
 	return isForked(c.ArchimedesBlock, num)
+}
+
+// IsShanghai returns whether num is either equal to the Shanghai fork block or greater.
+func (c *ChainConfig) IsShanghai(num *big.Int) bool {
+	return isForked(c.ShanghaiBlock, num)
 }
 
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
@@ -881,6 +896,7 @@ func (c *ChainConfig) CheckConfigForkOrder() error {
 		{name: "londonBlock", block: c.LondonBlock},
 		{name: "arrowGlacierBlock", block: c.ArrowGlacierBlock, optional: true},
 		{name: "ArchimedesBlock", block: c.ArchimedesBlock, optional: true},
+		{name: "shanghaiBlock", block: c.ShanghaiBlock, optional: true},
 		{name: "grayGlacierBlock", block: c.GrayGlacierBlock, optional: true},
 		{name: "mergeNetsplitBlock", block: c.MergeNetsplitBlock, optional: true},
 		{name: "shanghaiTime", timestamp: c.ShanghaiTime},
@@ -976,6 +992,9 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, headNumber *big.Int, 
 	}
 	if isForkBlockIncompatible(c.ArchimedesBlock, newcfg.ArchimedesBlock, headNumber) {
 		return newBlockCompatError("Archimedes fork block", c.ArchimedesBlock, newcfg.ArchimedesBlock)
+	}
+	if isForkBlockIncompatible(c.ShanghaiBlock, newcfg.ShanghaiBlock, head) {
+		return newBlockCompatError("Shanghai fork block", c.ShanghaiBlock, newcfg.ShanghaiBlock)
 	}
 	if isForkBlockIncompatible(c.GrayGlacierBlock, newcfg.GrayGlacierBlock, headNumber) {
 		return newBlockCompatError("Gray Glacier fork block", c.GrayGlacierBlock, newcfg.GrayGlacierBlock)
@@ -1158,6 +1177,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsBerlin:         c.IsBerlin(num),
 		IsLondon:         c.IsLondon(num),
 		IsArchimedes:     c.IsArchimedes(num),
+		IsShanghai:       c.IsShanghai(num),
 		IsMerge:          isMerge,
 		IsShanghai:       c.IsShanghai(timestamp),
 		isCancun:         c.IsCancun(timestamp),
