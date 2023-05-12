@@ -24,7 +24,7 @@ import (
 	"sort"
 	"time"
 
-	zkt "github.com/iswallet/zktrie/types"
+	zkt "github.com/scroll-tech/zktrie/types"
 
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/rawdb"
@@ -1132,6 +1132,7 @@ func (s *StateDB) Commit(deleteEmptyObjects bool) (common.Hash, error) {
 // - Add destination to access list (2929)
 // - Add precompiles to access list (2929)
 // - Add the contents of the optional tx access list (2930)
+// - Add coinbase to access list (3651)
 //
 // Potential EIPs:
 // - Reset access list (Berlin)
