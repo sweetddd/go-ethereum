@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/core"
 	"math/big"
 
 	"github.com/dop251/goja"
@@ -251,6 +252,8 @@ func (t *jsTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Addr
 	// Update list of precompiles based on current block
 	rules := env.ChainConfig().Rules(env.Context.BlockNumber, env.Context.Random != nil, env.Context.Time)
 	t.activePrecompiles = vm.ActivePrecompiles(rules)
+	isShanghai := env.ChainConfig().IsShanghai(env.Context.BlockNumber)
+	intrinsicGas, err := core.IntrinsicGas(input, nil, t.ctx["type"] == "CREATE", isHomestead, isIstanbul, isShanghai)
 }
 
 // CaptureState implements the Tracer interface to trace a single step of VM execution.
