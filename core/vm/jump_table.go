@@ -88,6 +88,8 @@ func newShanghaiInstructionSet() JumpTable {
 
 func newMergeInstructionSet() JumpTable {
 	instructionSet := newLondonInstructionSet()
+	enable3855(&instructionSet) // PUSH0 instruction https://eips.ethereum.org/EIPS/eip-3855
+	enable3860(&instructionSet) // Limit and meter initcode https://eips.ethereum.org/EIPS/eip-3860
 	instructionSet[PREVRANDAO] = &operation{
 		execute:     opRandom,
 		constantGas: GasQuickStep,
