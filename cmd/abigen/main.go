@@ -72,6 +72,10 @@ var (
 		Name:  "alias",
 		Usage: "Comma separated aliases for function and event renaming, e.g. original1=alias1, original2=alias2",
 	}
+	contractFlag = cli.StringFlag{
+		Name:  "contract",
+		Usage: "Name of the contract to generate the bindings for",
+	}
 )
 
 var app = flags.NewApp("Ethereum ABI wrapper code generator")
@@ -88,6 +92,7 @@ func init() {
 		outFlag,
 		langFlag,
 		aliasFlag,
+		contractFlag,
 	}
 	app.Action = abigen
 }
