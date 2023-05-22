@@ -225,7 +225,6 @@ var (
 	}
 
 	// ScrollAlphaChainConfig contains the chain parameters to run a node on the Scroll Alpha test network.
-	ScrollFeeVaultAddress           = common.HexToAddress("0x5300000000000000000000000000000000000005")
 	ScrollMaxTxPerBlock             = 44
 	ScrollMaxTxPayloadBytesPerBlock = 120 * 1024
 
@@ -255,7 +254,7 @@ var (
 			UseZktrie:                 true,
 			MaxTxPerBlock:             &ScrollMaxTxPerBlock,
 			MaxTxPayloadBytesPerBlock: &ScrollMaxTxPayloadBytesPerBlock,
-			FeeVaultAddress:           &ScrollFeeVaultAddress,
+			FeeVaultAddress:           &rcfg.ScrollFeeVaultAddress,
 			EnableEIP2718:             false,
 			EnableEIP1559:             false,
 		},
