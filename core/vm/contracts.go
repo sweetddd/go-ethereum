@@ -32,6 +32,10 @@ import (
 	"golang.org/x/crypto/ripemd160"
 )
 
+var (
+	errPrecompileDisabled = errors.New("sha256, ripemd160, blake2f precompiles temporarily disabled")
+)
+
 // PrecompiledContract is the basic interface for native Go contracts. The implementation
 // requires a deterministic gas count based on the input size of the Run method of the
 // contract.
@@ -94,11 +98,14 @@ var PrecompiledContractsBerlin = map[common.Address]PrecompiledContract{
 // contracts used in the Archimedes release. Same as Berlin but without sha2, blake2f, ripemd160
 var PrecompiledContractsArchimedes = map[common.Address]PrecompiledContract{
 	common.BytesToAddress([]byte{1}): &ecrecover{},
+	common.BytesToAddress([]byte{2}): &sha256hashDisabled{},
+	common.BytesToAddress([]byte{3}): &ripemd160hashDisabled{},
 	common.BytesToAddress([]byte{4}): &dataCopy{},
 	common.BytesToAddress([]byte{5}): &bigModExp{eip2565: true},
 	common.BytesToAddress([]byte{6}): &bn256AddIstanbul{},
 	common.BytesToAddress([]byte{7}): &bn256ScalarMulIstanbul{},
 	common.BytesToAddress([]byte{8}): &bn256PairingIstanbul{},
+	common.BytesToAddress([]byte{9}): &blake2FDisabled{},
 }
 
 // PrecompiledContractsBLS contains the set of pre-compiled Ethereum
@@ -225,6 +232,15 @@ func (c *sha256hash) Run(input []byte) ([]byte, error) {
 	return h[:], nil
 }
 
+type sha256hashDisabled struct{}
+
+func (c *sha256hashDisabled) RequiredGas(input []byte) uint64 {
+	return (&sha256hash{}).RequiredGas(input)
+}
+func (c *sha256hashDisabled) Run(input []byte) ([]byte, error) {
+	return nil, errPrecompileDisabled
+}
+
 // RIPEMD160 implemented as a native contract.
 type ripemd160hash struct{}
 
@@ -239,6 +255,15 @@ func (c *ripemd160hash) Run(input []byte) ([]byte, error) {
 	ripemd := ripemd160.New()
 	ripemd.Write(input)
 	return common.LeftPadBytes(ripemd.Sum(nil), 32), nil
+}
+
+type ripemd160hashDisabled struct{}
+
+func (c *ripemd160hashDisabled) RequiredGas(input []byte) uint64 {
+	return (&ripemd160hash{}).RequiredGas(input)
+}
+func (c *ripemd160hashDisabled) Run(input []byte) ([]byte, error) {
+	return nil, errPrecompileDisabled
 }
 
 // data copy implemented as a native contract.
@@ -639,6 +664,15 @@ func (c *blake2F) Run(input []byte) ([]byte, error) {
 		binary.LittleEndian.PutUint64(output[offset:offset+8], h[i])
 	}
 	return output, nil
+}
+
+type blake2FDisabled struct{}
+
+func (c *blake2FDisabled) RequiredGas(input []byte) uint64 {
+	return (&blake2F{}).RequiredGas(input)
+}
+func (c *blake2FDisabled) Run(input []byte) ([]byte, error) {
+	return nil, errPrecompileDisabled
 }
 
 var (
