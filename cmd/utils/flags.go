@@ -1018,6 +1018,20 @@ var (
 		RemoteDBFlag,
 		HttpHeaderFlag,
 	}
+
+	// L1Settings
+	L1EndpointFlag = cli.StringFlag{
+		Name:  "l1.endpoint",
+		Usage: "Endpoint of L1 HTTP-RPC server",
+	}
+	L1ConfirmationsFlag = cli.StringFlag{
+		Name:  "l1.confirmations",
+		Usage: "Number of confirmations on L1 needed for finalization, or \"safe\" or \"finalized\"",
+	}
+	L1DeploymentBlockFlag = cli.Int64Flag{
+		Name:  "l1.sync.startblock",
+		Usage: "L1 block height to start syncing from. Should be set to the L1 message queue deployment block number.",
+	}
 )
 
 func init() {
@@ -1475,6 +1489,7 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	setNodeUserIdent(ctx, cfg)
 	SetDataDir(ctx, cfg)
 	setSmartCard(ctx, cfg)
+	setL1(ctx, cfg)
 
 	if ctx.IsSet(JWTSecretFlag.Name) {
 		cfg.JWTSecret = ctx.String(JWTSecretFlag.Name)
@@ -1513,6 +1528,42 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 		}
 		log.Info(fmt.Sprintf("Using %s as db engine", dbEngine))
 		cfg.DBEngine = dbEngine
+	}
+}
+
+func unmarshalBlockNumber(input string) (rpc.BlockNumber, error) {
+	switch input {
+	case "finalized":
+		return rpc.FinalizedBlockNumber, nil
+	case "safe":
+		return rpc.SafeBlockNumber, nil
+	}
+	blockNum, err := hexutil.DecodeUint64(input)
+	if err == nil && blockNum <= math.MaxInt64 {
+		return rpc.BlockNumber(blockNum), nil
+	}
+	blockNum, err = strconv.ParseUint(input, 10, 64)
+	if err == nil && blockNum <= math.MaxInt64 {
+		return rpc.BlockNumber(blockNum), nil
+	}
+	return 0, errors.New("incorrect value")
+}
+
+func setL1(ctx *cli.Context, cfg *node.Config) {
+	var err error
+	if ctx.GlobalIsSet(L1EndpointFlag.Name) {
+		cfg.L1Endpoint = ctx.GlobalString(L1EndpointFlag.Name)
+	}
+	if ctx.GlobalIsSet(L1ConfirmationsFlag.Name) {
+		cfg.L1Confirmations, err = unmarshalBlockNumber(ctx.GlobalString(L1ConfirmationsFlag.Name))
+		if err != nil {
+			panic(fmt.Sprintf("invalid value for flag %s: %s", L1ConfirmationsFlag.Name, ctx.GlobalString(L1ConfirmationsFlag.Name)))
+		}
+	} else {
+		cfg.L1Confirmations = rpc.FinalizedBlockNumber
+	}
+	if ctx.GlobalIsSet(L1DeploymentBlockFlag.Name) {
+		cfg.L1DeploymentBlock = ctx.GlobalUint64(L1DeploymentBlockFlag.Name)
 	}
 }
 
@@ -2018,7 +2069,23 @@ func RegisterEthService(stack *node.Node, cfg *ethconfig.Config) (ethapi.Backend
 		}
 		return backend.ApiBackend, nil
 	}
-	backend, err := eth.New(stack, cfg)
+
+	// initialize L1 client for sync service
+	// note: we need to do this here to avoid circular dependency
+	l1EndpointUrl := stack.Config().L1Endpoint
+	var l1Client *ethclient.Client
+
+	if l1EndpointUrl != "" {
+		var err error
+		l1Client, err = ethclient.Dial(l1EndpointUrl)
+		if err != nil {
+			Fatalf("Unable to connect to L1 endpoint at %v: %v", l1EndpointUrl, err)
+		}
+
+		log.Info("Initialized L1 client", "endpoint", l1EndpointUrl)
+	}
+
+	backend, err := eth.New(stack, cfg, l1Client)
 	if err != nil {
 		Fatalf("Failed to register the Ethereum service: %v", err)
 	}

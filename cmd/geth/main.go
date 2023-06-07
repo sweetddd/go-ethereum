@@ -150,6 +150,9 @@ var (
 		utils.GpoMaxGasPriceFlag,
 		utils.GpoIgnoreGasPriceFlag,
 		utils.MinerNotifyFullFlag,
+		utils.L1EndpointFlag,
+		utils.L1ConfirmationsFlag,
+		utils.L1DeploymentBlockFlag,
 		configFileFlag,
 	}, utils.NetworkFlags, utils.DatabasePathFlags)
 

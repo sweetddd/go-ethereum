@@ -257,6 +257,11 @@ var (
 			FeeVaultAddress:           &rcfg.ScrollFeeVaultAddress,
 			EnableEIP2718:             false,
 			EnableEIP1559:             false,
+			L1Config: &L1Config{
+				L1ChainId:             5,
+				L1MessageQueueAddress: common.HexToAddress("0x79DB48002Aa861C8cb189cabc21c6B1468BC83BB"),
+				NumL1MessagesPerBlock: 0,
+			},
 		},
 	}
 
@@ -297,6 +302,7 @@ var (
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
 			MaxTxPayloadBytesPerBlock: nil,
+			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
 	}
 
@@ -337,6 +343,7 @@ var (
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
 			MaxTxPayloadBytesPerBlock: nil,
+			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
 	}
 
@@ -377,6 +384,7 @@ var (
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
 			MaxTxPayloadBytesPerBlock: nil,
+			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
 	}
 
@@ -446,6 +454,7 @@ var (
 			EnableEIP1559:   true,
 			MaxTxPerBlock:   nil,
 			MaxTxPayloadBytesPerBlock: nil,
+			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
 	}
 )
@@ -580,6 +589,25 @@ type ScrollConfig struct {
 
 	// Enable EIP-1559 in tx pool, EnableEIP2718 should be true too [optional]
 	EnableEIP1559 bool `json:"enableEIP1559,omitempty"`
+
+	// L1 config
+	L1Config *L1Config `json:"l1Config,omitempty"`
+}
+
+// L1Config contains the l1 parameters needed to collect l1 messages in the sequencer
+type L1Config struct {
+	L1ChainId             uint64         `json:"l1ChainId,string,omitempty"`
+	L1MessageQueueAddress common.Address `json:"l1MessageQueueAddress,omitempty"`
+	NumL1MessagesPerBlock uint64         `json:"numL1MessagesPerBlock,string,omitempty"`
+}
+
+func (c *L1Config) String() string {
+	if c == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf("{l1ChainId: %v, l1MessageQueueAddress: %v, numL1MessagesPerBlock: %v}",
+		c.L1ChainId, c.L1MessageQueueAddress, c.NumL1MessagesPerBlock)
 }
 
 func (s ScrollConfig) BaseFeeEnabled() bool {
@@ -594,6 +622,10 @@ func (s ScrollConfig) ZktrieEnabled() bool {
 	return s.UseZktrie
 }
 
+func (s ScrollConfig) ShouldIncludeL1Messages() bool {
+	return s.L1Config != nil && s.L1Config.NumL1MessagesPerBlock > 0
+}
+
 func (s ScrollConfig) String() string {
 	maxTxPerBlock := "<nil>"
 	if s.MaxTxPerBlock != nil {
@@ -605,12 +637,13 @@ func (s ScrollConfig) String() string {
 		maxTxPayloadBytesPerBlock = fmt.Sprintf("%v", *s.MaxTxPayloadBytesPerBlock)
 	}
 
-	return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: %v, MaxTxPayloadBytesPerBlock: %v, feeVaultAddress: %v, enableEIP2718:%v, enableEIP1559:%v}",
-		s.UseZktrie, maxTxPerBlock, maxTxPayloadBytesPerBlock, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559)
+	return fmt.Sprintf("{useZktrie: %v, maxTxPerBlock: %v, MaxTxPayloadBytesPerBlock: %v, feeVaultAddress: %v, enableEIP2718: %v, enableEIP1559: %v, l1Config: %v}",
+		s.UseZktrie, maxTxPerBlock, maxTxPayloadBytesPerBlock, s.FeeVaultAddress, s.EnableEIP2718, s.EnableEIP1559, s.L1Config.String())
 }
 
-// IsValidTxCount returns whether the given block's transaction count is below the limit.
-func (s ScrollConfig) IsValidTxCount(count int) bool {
+// IsValidL2TxCount returns whether the given block's L2 transaction count is below the limit.
+// This limit corresponds to the number of ECDSA signature checks that we can fit into the zkEVM.
+func (s ScrollConfig) IsValidL2TxCount(count int) bool {
 	return s.MaxTxPerBlock == nil || count <= *s.MaxTxPerBlock
 }
 

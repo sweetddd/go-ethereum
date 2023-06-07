@@ -31,9 +31,11 @@ import (
 	"github.com/iswallet/go-ethereum/core/txpool"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/eth/downloader"
+	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/event"
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rollup/sync_service"
 )
 
 // Backend wraps all methods required for mining. Only full node is capable
@@ -41,6 +43,9 @@ import (
 type Backend interface {
 	BlockChain() *core.BlockChain
 	TxPool() *txpool.TxPool
+	ChainDb() ethdb.Database
+	SyncService() *sync_service.SyncService
+
 }
 
 // Config is the configuration parameters of mining.
