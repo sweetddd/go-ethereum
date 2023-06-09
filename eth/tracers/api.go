@@ -1015,6 +1015,7 @@ func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Conte
 			Failed:      result.Failed(),
 			ReturnValue: returnVal,
 			StructLogs:  vm.FormatLogs(tracer.StructLogs()),
+			L1Fee:       (*hexutil.Big)(result.L1Fee),
 		}, nil
 
 	case Tracer:

@@ -233,6 +233,7 @@ func TestTraceCall(t *testing.T) {
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
 			expect: &types.ExecutionResult{
+				L1Fee:       (*hexutil.Big)(big.NewInt(0)),
 				Gas:         params.TxGas,
 				Failed:      false,
 				ReturnValue: "",
@@ -251,6 +252,7 @@ func TestTraceCall(t *testing.T) {
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
 			expect: &types.ExecutionResult{
+				L1Fee:       (*hexutil.Big)(big.NewInt(0)),
 				Gas:         params.TxGas,
 				Failed:      false,
 				ReturnValue: "",
@@ -281,6 +283,7 @@ func TestTraceCall(t *testing.T) {
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
 			expect: &types.ExecutionResult{
+				L1Fee:       (*hexutil.Big)(big.NewInt(0)),
 				Gas:         params.TxGas,
 				Failed:      false,
 				ReturnValue: "",
@@ -312,6 +315,7 @@ func TestTraceCall(t *testing.T) {
 		{"pc":0,"op":"NUMBER","gas":24946984,"gasCost":2,"depth":1,"stack":[]},
 		{"pc":1,"op":"STOP","gas":24946982,"gasCost":0,"depth":1,"stack":["0x1337"]}]}`,
 			expect: &types.ExecutionResult{
+				L1Fee:       (*hexutil.Big)(big.NewInt(0)),
 				Gas:         params.TxGas,
 				Failed:      false,
 				ReturnValue: "",
@@ -382,14 +386,11 @@ func TestTraceTransaction(t *testing.T) {
 		t.Errorf("failed to unmarshal result %v", err)
 	}
 	if !reflect.DeepEqual(have, &logger.ExecutionResult{
+		L1Fee:       (*hexutil.Big)(big.NewInt(0)),
 		Gas:         params.TxGas,
 		Failed:      false,
 		ReturnValue: "",
-<<<<<<< HEAD
 		StructLogs:  []logger.StructLogRes{},
-=======
-		StructLogs:  []*types.StructLogRes{},
->>>>>>> 9b99f2e17 (fix bug and optimize fill_trace logic for gc (#104))
 	}) {
 		t.Error("Transaction tracing result is different")
 	}
