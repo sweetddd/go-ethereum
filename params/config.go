@@ -419,7 +419,7 @@ var (
 	}
 	TestRules = TestChainConfig.Rules(new(big.Int), false, 0)
 	// and accepted by the Ethereum core developers for testing proposes.
-	TestNoL1feeChainConfig = &ChainConfig{
+	TestNoL1DataFeeChainConfig = &ChainConfig{
 		ChainID:                       big.NewInt(1),
 		HomesteadBlock:                big.NewInt(0),
 		DAOForkBlock:                  nil,

@@ -983,7 +983,7 @@ func newRPCBalance(balance *big.Int) **hexutil.Big {
 	return &rpcBalance
 }
 
-func CalculateL1MsgFee(ctx context.Context, b Backend, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride, timeout time.Duration, globalGasCap uint64, config *params.ChainConfig) (*big.Int, error) {
+func EstimateL1MsgFee(ctx context.Context, b Backend, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride, timeout time.Duration, globalGasCap uint64, config *params.ChainConfig) (*big.Int, error) {
 	if !config.Scroll.FeeVaultEnabled() {
 		return big.NewInt(0), nil
 	}
@@ -1023,7 +1023,8 @@ func CalculateL1MsgFee(ctx context.Context, b Backend, args TransactionArgs, blo
 		evm.Cancel()
 	}()
 
-	return fees.CalculateL1MsgFee(msg, evm.StateDB)
+	signer := types.MakeSigner(config, header.Number)
+	return fees.EstimateL1DataFeeForMessage(msg, header.BaseFee, config.ChainID, signer, evm.StateDB)
 }
 
 func DoCall(ctx context.Context, b Backend, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride, timeout time.Duration, globalGasCap uint64) (*core.ExecutionResult, error) {
@@ -1066,7 +1067,14 @@ func DoCall(ctx context.Context, b Backend, args TransactionArgs, blockNrOrHash 
 
 	// Execute the message.
 	gp := new(core.GasPool).AddGas(math.MaxUint64)
-	result, err := core.ApplyMessage(evm, msg, gp)
+
+	signer := types.MakeSigner(b.ChainConfig(), header.Number)
+	l1DataFee, err := fees.EstimateL1DataFeeForMessage(msg, header.BaseFee, b.ChainConfig().ChainID, signer, state)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := core.ApplyMessage(evm, msg, gp, l1DataFee)
 	if err := vmError(); err != nil {
 		return nil, err
 	}
@@ -1120,7 +1128,7 @@ func (e *revertError) ErrorData() interface{} {
 func (s *BlockChainAPI) Call(ctx context.Context, args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash, overrides *StateOverride) (hexutil.Bytes, error) {
 
 	// If gasPrice is 0 and no state override is set, make sure
-	// that the account has sufficient balance to cover `l1Fee`.
+	// that the account has sufficient balance to cover `l1DataFee`.
 	isGasPriceZero := args.GasPrice == nil || args.GasPrice.ToInt().Cmp(big.NewInt(0)) == 0
 
 	if overrides == nil {
@@ -1129,13 +1137,13 @@ func (s *BlockChainAPI) Call(ctx context.Context, args TransactionArgs, blockNrO
 	_, isOverrideSet := (*overrides)[args.from()]
 
 	if isGasPriceZero && !isOverrideSet {
-		l1Fee, err := CalculateL1MsgFee(ctx, s.b, args, blockNrOrHash, overrides, s.b.RPCEVMTimeout(), s.b.RPCGasCap(), s.b.ChainConfig())
+		l1DataFee, err := EstimateL1MsgFee(ctx, s.b, args, blockNrOrHash, overrides, s.b.RPCEVMTimeout(), s.b.RPCGasCap(), s.b.ChainConfig())
 		if err != nil {
 			return nil, err
 		}
 
 		(*overrides)[args.from()] = OverrideAccount{
-			BalanceAdd: newRPCBalance(l1Fee),
+			BalanceAdd: newRPCBalance(l1DataFee),
 		}
 	}
 
@@ -1204,14 +1212,14 @@ func DoEstimateGas(ctx context.Context, b Backend, args TransactionArgs, blockNr
 		}
 
 		// account for l1 fee
-		l1Fee, err := CalculateL1MsgFee(ctx, b, args, blockNrOrHash, nil, 0, gasCap, b.ChainConfig())
+		l1DataFee, err := EstimateL1MsgFee(ctx, b, args, blockNrOrHash, nil, 0, gasCap, b.ChainConfig())
 		if err != nil {
 			return 0, err
 		}
-		if l1Fee.Cmp(available) >= 0 {
+		if l1DataFee.Cmp(available) >= 0 {
 			return 0, errors.New("insufficient funds for l1 fee")
 		}
-		available.Sub(available, l1Fee)
+		available.Sub(available, l1DataFee)
 
 		allowance := new(big.Int).Div(available, feeCap)
 
@@ -1583,7 +1591,12 @@ func AccessList(ctx context.Context, b Backend, blockNrOrHash rpc.BlockNumberOrH
 		if err != nil {
 			return nil, 0, nil, err
 		}
-		res, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit))
+		signer := types.MakeSigner(b.ChainConfig(), header.Number)
+		l1DataFee, err := fees.EstimateL1DataFeeForMessage(msg, header.BaseFee, b.ChainConfig().ChainID, signer, statedb)
+		if err != nil {
+			return nil, 0, nil, fmt.Errorf("failed to apply transaction: %v err: %v", args.toTransaction().Hash(), err)
+		}
+		res, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit), l1DataFee)
 		if err != nil {
 			return nil, 0, nil, fmt.Errorf("failed to apply transaction: %v err: %v", args.toTransaction().Hash(), err)
 		}
