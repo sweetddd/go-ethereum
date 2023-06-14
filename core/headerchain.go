@@ -26,15 +26,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/lru"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common/lru"
+	"github.com/iswallet/go-ethereum/consensus"
+	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/ethdb"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rlp"
 )
 
 const (

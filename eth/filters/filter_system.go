@@ -25,18 +25,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/ethereum/go-ethereum"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/lru"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/bloombits"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethdb"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common/lru"
+	"github.com/iswallet/go-ethereum/core"
+	"github.com/iswallet/go-ethereum/core/bloombits"
+	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/ethdb"
+	"github.com/iswallet/go-ethereum/event"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rpc"
 )
 
 // Config represents the configuration of the filter system.
@@ -181,16 +180,16 @@ const (
 )
 
 type subscription struct {
-	id        rpc.ID
-	typ       Type
-	created   time.Time
-	logsCrit  ethereum.FilterQuery
-	logs      chan []*types.Log
-	txs       chan []*types.Transaction
-	headers   chan *types.Header
+	id           rpc.ID
+	typ          Type
+	created      time.Time
+	logsCrit     ethereum.FilterQuery
+	logs         chan []*types.Log
+	txs          chan []*types.Transaction
+	headers      chan *types.Header
 	blockResults chan *types.BlockResult
-	installed chan struct{} // closed when the filter is installed
-	err       chan error    // closed when the filter is uninstalled
+	installed    chan struct{} // closed when the filter is installed
+	err          chan error    // closed when the filter is uninstalled
 }
 
 // EventSystem creates subscriptions, processes events and broadcasts them to the

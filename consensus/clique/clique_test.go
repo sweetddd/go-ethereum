@@ -20,13 +20,13 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/rawdb"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/core/vm"
-	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core"
+	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/core/vm"
+	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/params"
 )
 
 // This test case is a repro of an annoying bug that took us forever to catch.

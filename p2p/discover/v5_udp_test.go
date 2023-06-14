@@ -28,12 +28,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/internal/testlog"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/p2p/discover/v5wire"
-	"github.com/ethereum/go-ethereum/p2p/enode"
-	"github.com/ethereum/go-ethereum/p2p/enr"
-	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/iswallet/go-ethereum/internal/testlog"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/p2p/discover/v5wire"
+	"github.com/iswallet/go-ethereum/p2p/enode"
+	"github.com/iswallet/go-ethereum/p2p/enr"
+	"github.com/iswallet/go-ethereum/rlp"
 	"github.com/stretchr/testify/require"
 )
 

@@ -19,7 +19,7 @@ package vm
 import (
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common"
 )
 
 // EVMLogger is used to collect execution traces from an EVM transaction
@@ -41,7 +41,6 @@ type EVMLogger interface {
 	CaptureState(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, rData []byte, depth int, err error)
 	CaptureFault(pc uint64, op OpCode, gas, cost uint64, scope *ScopeContext, depth int, err error)
 }
-
 
 // FormatLogs formats EVM returned structured logs for json output
 func FormatLogs(logs []StructLog) []types.StructLogRes {

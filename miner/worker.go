@@ -19,22 +19,23 @@ package miner
 import (
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/core/vm"
 	"math/big"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	mapset "github.com/deckarep/golang-set/v2"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/consensus"
-	"github.com/ethereum/go-ethereum/consensus/misc"
-	"github.com/ethereum/go-ethereum/core"
-	"github.com/ethereum/go-ethereum/core/state"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/event"
-	"github.com/ethereum/go-ethereum/log"
-	"github.com/ethereum/go-ethereum/params"
-	"github.com/ethereum/go-ethereum/trie"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/consensus"
+	"github.com/iswallet/go-ethereum/consensus/misc"
+	"github.com/iswallet/go-ethereum/core"
+	"github.com/iswallet/go-ethereum/core/state"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/event"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/trie"
 )
 
 const (
@@ -95,10 +96,10 @@ type environment struct {
 	gasPool   *core.GasPool           // available gas used to pack transactions
 	coinbase  common.Address
 
-	header   *types.Header
-	txs      []*types.Transaction
-	receipts []*types.Receipt
-	uncles   map[common.Hash]*types.Header
+	header           *types.Header
+	txs              []*types.Transaction
+	receipts         []*types.Receipt
+	uncles           map[common.Hash]*types.Header
 	executionResults []*types.ExecutionResult
 }
 
@@ -777,7 +778,7 @@ func (w *worker) resultLoop() {
 				logs = append(logs, receipt.Logs...)
 			}
 			// Commit block and state to database.
-			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, &types.BlockResult{ExecutionResults: evmTraces},task.state, true)
+			_, err := w.chain.WriteBlockAndSetHead(block, receipts, logs, &types.BlockResult{ExecutionResults: evmTraces}, task.state, true)
 			if err != nil {
 				log.Error("Failed writing block to chain", "err", err)
 				continue
