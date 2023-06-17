@@ -1,9 +1,9 @@
 package codehash
 
 import (
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/crypto"
-	"github.com/scroll-tech/go-ethereum/crypto/poseidon"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/poseidon"
 )
 
 var EmptyPoseidonCodeHash common.Hash

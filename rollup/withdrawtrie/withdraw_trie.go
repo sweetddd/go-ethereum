@@ -1,8 +1,8 @@
 package withdrawtrie
 
 import (
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/rollup/rcfg"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/rollup/rcfg"
 )
 
 // StateDB represents the StateDB interface

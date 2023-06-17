@@ -22,11 +22,11 @@ import (
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/crypto/poseidon"
-	"github.com/scroll-tech/go-ethereum/ethdb"
-	"github.com/scroll-tech/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/crypto/poseidon"
+	"github.com/iswallet/go-ethereum/ethdb"
+	"github.com/iswallet/go-ethereum/log"
 )
 
 var magicHash []byte = []byte("THIS IS THE MAGIC INDEX FOR ZKTRIE")

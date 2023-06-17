@@ -19,6 +19,7 @@ require (
 	github.com/docker/docker v1.6.2
 	github.com/dop251/goja v0.0.0-20230122112309-96b1610dd4f7
 	github.com/edsrzf/mmap-go v1.0.0
+	github.com/ethereum/go-ethereum v1.10.26
 	github.com/fatih/color v1.7.0
 	github.com/fjl/gencodec v0.0.0-20220412091415-8bb9e558978c
 	github.com/fjl/memsize v0.0.0-20190710130421-bcb5799ab5e5
@@ -38,6 +39,7 @@ require (
 	github.com/holiman/bloomfilter/v2 v2.0.3
 	github.com/holiman/uint256 v1.2.0
 	github.com/huin/goupnp v1.0.3
+	github.com/iden3/go-iden3-crypto v0.0.15
 	github.com/influxdata/influxdb v1.8.3
 	github.com/influxdata/influxdb-client-go/v2 v2.4.0
 	github.com/jackpal/go-nat-pmp v1.0.2
@@ -59,13 +61,13 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/urfave/cli/v2 v2.17.2-0.20221006022127-8f469abc00aa
-	golang.org/x/crypto v0.6.0
+	golang.org/x/crypto v0.7.0
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
 	golang.org/x/sync v0.1.0
-	golang.org/x/sys v0.5.0
-	golang.org/x/text v0.7.0
+	golang.org/x/sys v0.6.0
+	golang.org/x/text v0.8.0
 	golang.org/x/time v0.0.0-20220922220347-f3bd1da661af
-	golang.org/x/tools v0.2.0
+	golang.org/x/tools v0.6.0
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce
 )
 
@@ -117,11 +119,10 @@ require (
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	golang.org/x/mod v0.6.0 // indirect
-	golang.org/x/net v0.4.0 // indirect
+	golang.org/x/mod v0.8.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
-	gotest.tools v1.4.0 // indirect
 )

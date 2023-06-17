@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/trie/zkproof"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/trie/zkproof"
 )
 
 func init() {
@@ -160,7 +160,7 @@ func TestFailedCallTx(t *testing.T) {
 
 }
 
-//notice: now only work with OP_ORDER=2
+// notice: now only work with OP_ORDER=2
 func TestDeleteTx(t *testing.T) {
 	trace := loadStaff(t, "blocktraces/mpt_witness/delete.json")
 	traces, err := zkproof.HandleBlockTrace(trace)
@@ -171,7 +171,7 @@ func TestDeleteTx(t *testing.T) {
 	}
 }
 
-//notice: now only work with OP_ORDER=2
+// notice: now only work with OP_ORDER=2
 func TestDestructTx(t *testing.T) {
 	trace := loadStaff(t, "blocktraces/mpt_witness/destruct.json")
 	traces, err := zkproof.HandleBlockTrace(trace)

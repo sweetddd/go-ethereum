@@ -8,13 +8,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/scroll-tech/go-ethereum/accounts/abi/bind"
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/common/hexutil"
-	"github.com/scroll-tech/go-ethereum/core"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/params"
-	"github.com/scroll-tech/go-ethereum/rpc"
+	"github.com/iswallet/go-ethereum/accounts/abi/bind"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common/hexutil"
+	"github.com/iswallet/go-ethereum/core"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rpc"
 )
 
 // erc20MetaData contains all meta data concerning the ERC20 contract.

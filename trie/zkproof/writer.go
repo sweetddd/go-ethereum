@@ -9,12 +9,12 @@ import (
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/common/hexutil"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/ethdb/memorydb"
-	"github.com/scroll-tech/go-ethereum/log"
-	"github.com/scroll-tech/go-ethereum/trie"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/common/hexutil"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/ethdb/memorydb"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/trie"
 )
 
 type proofList [][]byte
@@ -40,7 +40,7 @@ func addressToKey(addr common.Address) *zkt.Hash {
 	return zkt.NewHashFromBigInt(h)
 }
 
-//resume the proof bytes into db and return the leaf node
+// resume the proof bytes into db and return the leaf node
 func resumeProofs(proof []hexutil.Bytes, db *memorydb.Database) *zktrie.Node {
 	for _, buf := range proof {
 

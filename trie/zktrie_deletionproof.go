@@ -6,7 +6,7 @@ import (
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/scroll-tech/go-ethereum/ethdb"
+	"github.com/iswallet/go-ethereum/ethdb"
 )
 
 // Pick Node from its hash directly from database, notice it has different

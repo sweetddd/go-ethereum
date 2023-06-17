@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/scroll-tech/go-ethereum/accounts/abi/bind"
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/log"
-	"github.com/scroll-tech/go-ethereum/rpc"
+	"github.com/iswallet/go-ethereum/accounts/abi/bind"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/log"
+	"github.com/iswallet/go-ethereum/rpc"
 )
 
 // BridgeClient is a wrapper around EthClient that adds

@@ -12,9 +12,9 @@ import (
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/core/types"
-	"github.com/scroll-tech/go-ethereum/ethdb/memorydb"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum/ethdb/memorydb"
 )
 
 // we do not need zktrie impl anymore, only made a wrapper for adapting testing

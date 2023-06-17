@@ -29,9 +29,9 @@ import (
 
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/scroll-tech/go-ethereum/common"
-	"github.com/scroll-tech/go-ethereum/ethdb/leveldb"
-	"github.com/scroll-tech/go-ethereum/ethdb/memorydb"
+	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/ethdb/leveldb"
+	"github.com/iswallet/go-ethereum/ethdb/memorydb"
 )
 
 func newEmptyZkTrie() *ZkTrie {

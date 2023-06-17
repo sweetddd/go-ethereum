@@ -4,8 +4,8 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/scroll-tech/go-ethereum"
-	"github.com/scroll-tech/go-ethereum/core/types"
+	"github.com/iswallet/go-ethereum"
+	"github.com/iswallet/go-ethereum/core/types"
 )
 
 // We cannot use ethclient.Client directly as that would lead

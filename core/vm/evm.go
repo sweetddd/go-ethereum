@@ -23,7 +23,7 @@ import (
 	"github.com/holiman/uint256"
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/scroll-tech/go-ethereum/crypto/codehash"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/params"
 )
 
