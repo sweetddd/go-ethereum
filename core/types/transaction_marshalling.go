@@ -99,12 +99,12 @@ func (tx *Transaction) MarshalJSON() ([]byte, error) {
 		enc.R = (*hexutil.Big)(itx.R)
 		enc.S = (*hexutil.Big)(itx.S)
 	case *L1MessageTx:
-		enc.QueueIndex = (*hexutil.Uint64)(&tx.QueueIndex)
-		enc.Gas = (*hexutil.Uint64)(&tx.Gas)
-		enc.To = t.To()
-		enc.Value = (*hexutil.Big)(tx.Value)
-		enc.Data = (*hexutil.Bytes)(&tx.Data)
-		enc.Sender = tx.Sender
+		enc.QueueIndex = (*hexutil.Uint64)(&itx.QueueIndex)
+		enc.Gas = (*hexutil.Uint64)(&itx.Gas)
+		enc.To = tx.To()
+		enc.Value = (*hexutil.Big)(itx.Value)
+		enc.Data = (*hexutil.Bytes)(&itx.Data)
+		enc.Sender = itx.Sender
 	}
 	return json.Marshal(&enc)
 }

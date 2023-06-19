@@ -20,6 +20,7 @@ package downloader
 import (
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum"
 	"math/big"
 	"sync"
 	"sync/atomic"

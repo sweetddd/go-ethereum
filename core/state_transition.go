@@ -18,6 +18,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/iswallet/go-ethereum/log"
 	"math"
 	"math/big"
 
@@ -32,23 +33,22 @@ import (
 var emptyKeccakCodeHash = codehash.EmptyKeccakCodeHash
 
 // Message represents a message sent to a contract.
-type Message interface {
-	From() common.Address
-	To() *common.Address
-
-	GasPrice() *big.Int
-	GasFeeCap() *big.Int
-	GasTipCap() *big.Int
-	Gas() uint64
-	Value() *big.Int
-
-	Nonce() uint64
-	IsFake() bool
-	Data() []byte
-	AccessList() types.AccessList
-	IsL1MessageTx() bool
-}
-
+//type Message interface {
+//	From() common.Address
+//	To() *common.Address
+//
+//	GasPrice() *big.Int
+//	GasFeeCap() *big.Int
+//	GasTipCap() *big.Int
+//	Gas() uint64
+//	Value() *big.Int
+//
+//	Nonce() uint64
+//	IsFake() bool
+//	data() []byte
+//	AccessList() types.AccessList
+//	IsL1MessageTx() bool
+//}
 
 // ExecutionResult includes all output after executing given evm
 // message no matter the execution itself is successful or not.
@@ -163,6 +163,7 @@ type Message struct {
 	// account nonce in state. It also disables checking that the sender is an EOA.
 	// This field will be set to true for operations like RPC eth_call.
 	SkipAccountChecks bool
+	IsL1MessageTx     bool
 }
 
 // TransactionToMessage converts a transaction into a Message.
@@ -229,17 +230,17 @@ type StateTransition struct {
 	state        vm.StateDB
 	evm          *vm.EVM
 	// l1 rollup fee
-	l1Fee *big.Int
+	l1DataFee *big.Int
 }
 
 // NewStateTransition initialises and returns a new state transition object.
-func NewStateTransition(evm *vm.EVM, msg *Message, gp *GasPool,  l1DataFee *big.Int) *StateTransition {
+func NewStateTransition(evm *vm.EVM, msg *Message, gp *GasPool, l1DataFee *big.Int) *StateTransition {
 
 	return &StateTransition{
-		gp:    gp,
-		evm:   evm,
-		msg:   msg,
-		state: evm.StateDB,
+		gp:        gp,
+		evm:       evm,
+		msg:       msg,
+		state:     evm.StateDB,
 		l1DataFee: l1DataFee,
 	}
 }
@@ -259,7 +260,8 @@ func (st *StateTransition) buyGas() error {
 	if st.evm.ChainConfig().Scroll.FeeVaultEnabled() {
 		// should be fine to add st.l1DataFee even without `L1MessageTx` check, since L1MessageTx will come with 0 l1DataFee,
 		// but double check to make sure
-		if !st.msg.IsL1MessageTx() {
+		//if !st.msg.IsL1MessageTx {
+		if !st.msg.IsL1MessageTx {
 			log.Debug("Adding L1DataFee", "l1DataFee", st.l1DataFee)
 			mgval = mgval.Add(mgval, st.l1DataFee)
 		}
@@ -273,7 +275,7 @@ func (st *StateTransition) buyGas() error {
 		if st.evm.ChainConfig().Scroll.FeeVaultEnabled() {
 			// should be fine to add st.l1DataFee even without `L1MessageTx` check, since L1MessageTx will come with 0 l1DataFee,
 			// but double check to make sure
-			if !st.msg.IsL1MessageTx() {
+			if !st.msg.IsL1MessageTx {
 				balanceCheck.Add(balanceCheck, st.l1DataFee)
 			}
 		}
@@ -292,12 +294,12 @@ func (st *StateTransition) buyGas() error {
 }
 
 func (st *StateTransition) preCheck() error {
-	if st.msg.IsL1MessageTx() {
+	if st.msg.IsL1MessageTx {
 		// No fee fields to check, no nonce to check, and no need to check if EOA (L1 already verified it for us)
 		// Gas is free, but no refunds!
-		st.gas += st.msg.Gas()
-		st.initialGas = st.msg.Gas()
-		return st.gp.SubGas(st.msg.Gas()) // gas used by deposits may not be used by other txs
+		st.gasRemaining += st.msg.GasLimit
+		st.initialGas = st.msg.GasLimit
+		return st.gp.SubGas(st.msg.GasLimit) // gas used by deposits may not be used by other txs
 	}
 
 	// Only check transactions that are not fake
@@ -432,7 +434,7 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	}
 
 	// no refunds for l1 messages
-	if st.msg.IsL1MessageTx() {
+	if st.msg.IsL1MessageTx {
 		return &ExecutionResult{
 			L1DataFee:  big.NewInt(0),
 			UsedGas:    st.gasUsed(),
@@ -452,9 +454,9 @@ func (st *StateTransition) TransitionDb() (*ExecutionResult, error) {
 	if rules.IsLondon {
 		effectiveTip = cmath.BigMin(msg.GasTipCap, new(big.Int).Sub(msg.GasFeeCap, st.evm.Context.BaseFee))
 		if st.evm.Context.BaseFee != nil {
-			effectiveTip = cmath.BigMin(st.gasTipCap, new(big.Int).Sub(st.gasFeeCap, st.evm.Context.BaseFee))
+			effectiveTip = cmath.BigMin(msg.GasTipCap, new(big.Int).Sub(msg.GasFeeCap, st.evm.Context.BaseFee))
 		} else {
-			effectiveTip = cmath.BigMin(st.gasTipCap, st.gasFeeCap)
+			effectiveTip = cmath.BigMin(msg.GasTipCap, msg.GasFeeCap)
 		}
 	}
 

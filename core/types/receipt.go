@@ -105,11 +105,11 @@ type storedReceiptRLP struct {
 }
 
 // v5StoredReceiptRLP is the storage encoding of a receipt used in database version 5.
-type v5StoredReceiptRLP struct {
-	PostStateOrStatus []byte
-	CumulativeGasUsed uint64
-	Logs              []*LogForStorage
-}
+//type v5StoredReceiptRLP struct {
+//	PostStateOrStatus []byte
+//	CumulativeGasUsed uint64
+//	Logs              []*LogForStorage
+//}
 
 // NewReceipt creates a barebone transaction receipt, copying the init fields.
 // Deprecated: create receipts using a struct literal instead.
@@ -300,23 +300,23 @@ func (r *ReceiptForStorage) DecodeRLP(s *rlp.Stream) error {
 	return nil
 }
 
-func decodeV5StoredReceiptRLP(r *ReceiptForStorage, blob []byte) error {
-	var stored v5StoredReceiptRLP
-	if err := rlp.DecodeBytes(blob, &stored); err != nil {
-		return err
-	}
-	if err := (*Receipt)(r).setStatus(stored.PostStateOrStatus); err != nil {
-		return err
-	}
-	r.CumulativeGasUsed = stored.CumulativeGasUsed
-	r.Logs = make([]*Log, len(stored.Logs))
-	for i, log := range stored.Logs {
-		r.Logs[i] = (*Log)(log)
-	}
-	r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
-
-	return nil
-}
+//func decodeV5StoredReceiptRLP(r *ReceiptForStorage, blob []byte) error {
+//	var stored v5StoredReceiptRLP
+//	if err := rlp.DecodeBytes(blob, &stored); err != nil {
+//		return err
+//	}
+//	if err := (*Receipt)(r).setStatus(stored.PostStateOrStatus); err != nil {
+//		return err
+//	}
+//	r.CumulativeGasUsed = stored.CumulativeGasUsed
+//	r.Logs = make([]*Log, len(stored.Logs))
+//	for i, log := range stored.Logs {
+//		r.Logs[i] = (*Log)(log)
+//	}
+//	r.Bloom = CreateBloom(Receipts{(*Receipt)(r)})
+//
+//	return nil
+//}
 
 // Receipts implements DerivableList for receipts.
 type Receipts []*Receipt

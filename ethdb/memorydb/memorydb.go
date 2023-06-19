@@ -374,7 +374,7 @@ func (snap *snapshot) Get(key []byte) ([]byte, error) {
 	if entry, ok := snap.db[string(key)]; ok {
 		return common.CopyBytes(entry), nil
 	}
-	return nil, errMemorydbNotFound
+	return nil, ErrMemorydbNotFound
 }
 
 // Release releases associated resources. Release should always succeed and can

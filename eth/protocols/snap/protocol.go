@@ -133,7 +133,7 @@ type StorageRangesPacket struct {
 // StorageData represents a single storage slot in a query response.
 type StorageData struct {
 	Hash common.Hash // Hash of the storage slot
-	Body []byte      // Data content of the slot
+	Body []byte      // data content of the slot
 }
 
 // Unpack retrieves the storage slots from the range packet and returns them in

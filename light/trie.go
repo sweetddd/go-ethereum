@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/rawdb"

@@ -55,7 +55,7 @@ func (s *StateDB) GetStorageTrieForProof(addr common.Address) (Trie, error) {
 	if stateObject == nil {
 		// still return a empty trie
 		addrHash := crypto.Keccak256Hash(addr[:])
-		dummy_trie, _ := s.db.OpenStorageTrie(addrHash, common.Hash{})
+		dummy_trie, _ := s.db.OpenStorageTrie(common.Hash{}, addrHash, common.Hash{})
 		return dummy_trie, nil
 	}
 
@@ -63,7 +63,7 @@ func (s *StateDB) GetStorageTrieForProof(addr common.Address) (Trie, error) {
 	var err error
 	if trie == nil {
 		// use a new, temporary trie
-		trie, err = s.db.OpenStorageTrie(stateObject.addrHash, stateObject.data.Root)
+		trie, err = s.db.OpenStorageTrie(stateObject.db.originalRoot, stateObject.addrHash, stateObject.data.Root)
 		if err != nil {
 			return nil, fmt.Errorf("can't create storage trie on root %s: %v ", stateObject.data.Root, err)
 		}

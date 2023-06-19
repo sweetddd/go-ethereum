@@ -48,6 +48,7 @@ import (
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rlp"
 	"github.com/iswallet/go-ethereum/trie"
+	"github.com/iswallet/go-ethereum/trie/zkproof"
 )
 
 var (
@@ -241,7 +242,6 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		Cache:     cacheConfig.TrieCleanLimit,
 		Journal:   cacheConfig.TrieCleanJournal,
 		Preimages: cacheConfig.Preimages,
-		Zktrie:    chainConfig.Zktrie,
 	})
 	// Setup the genesis block, commit the provided genesis specification
 	// to database if the genesis block is not present yet, or load the
@@ -266,6 +266,8 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 	if chainConfig.Scroll.FeeVaultEnabled() {
 		log.Warn("Using fee vault address", "FeeVaultAddress", *chainConfig.Scroll.FeeVaultAddress)
 	}
+
+	triedb.Zktrie = chainConfig.Scroll.ZktrieEnabled()
 
 	bc := &BlockChain{
 		chainConfig:   chainConfig,
@@ -1363,23 +1365,7 @@ func (bc *BlockChain) writeKnownBlock(block *types.Block) error {
 
 // writeBlockWithState writes block, metadata and corresponding state data to the
 // database.
-//func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.Receipt, state *state.StateDB) error {
-// WriteBlockWithState writes the block and all associated state to the database.
-func (bc *BlockChain) WriteBlockWithState(block *types.Block, receipts []*types.Receipt, logs []*types.Log, state *state.StateDB, emitHeadEvent bool) (status WriteStatus, err error) {
-	if !bc.chainmu.TryLock() {
-		return NonStatTy, errInsertionInterrupted
-	}
-	defer bc.chainmu.Unlock()
-	return bc.writeBlockWithState(block, receipts, logs, state, emitHeadEvent)
-}
-
-// writeBlockWithState writes the block and all associated state to the database,
-// but is expects the chain mutex to be held.
-func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.Receipt, logs []*types.Log, state *state.StateDB, emitHeadEvent bool) (status WriteStatus, err error) {
-	if bc.insertStopped() {
-		return NonStatTy, errInsertionInterrupted
-	}
-
+func (bc *BlockChain) writeBlockWithState(block *types.Block, receipts []*types.Receipt, state *state.StateDB) error {
 	// Calculate the total difficulty of the block
 	ptd := bc.GetTd(block.ParentHash(), block.NumberU64()-1)
 	if ptd == nil {
@@ -1852,9 +1838,9 @@ func (bc *BlockChain) insertChain(chain types.Blocks, verifySeals, setHead bool)
 		} else {
 			status, err = bc.writeBlockAndSetHead(block, receipts, logs, statedb, false)
 		}
-		substart = time.Now()
+
 		// EvmTraces & StorageTrace being nil is safe because l2geth's p2p server is stoped and the code will not execute there.
-		status, err := bc.writeBlockWithState(block, receipts, logs, statedb, false)
+		err = bc.writeBlockWithState(block, receipts, statedb)
 		atomic.StoreUint32(&followupInterrupt, 1)
 		if err != nil {
 			return it.index, err

@@ -116,11 +116,21 @@ func (ga *GenesisAlloc) UnmarshalJSON(data []byte) error {
 }
 
 // deriveHash computes the state root according to the genesis specification.
-func (ga *GenesisAlloc) deriveHash() (common.Hash, error) {
+func (ga *GenesisAlloc) deriveHash(config *params.ChainConfig) (common.Hash, error) {
 	// Create an ephemeral in-memory database for computing hash,
 	// all the derived states will be discarded to not pollute disk.
-	db := state.NewDatabase(rawdb.NewMemoryDatabase())
-	statedb, err := state.New(common.Hash{}, db, nil)
+	//db := state.NewDatabase(rawdb.NewMemoryDatabase())
+	//statedb, err := state.New(common.Hash{}, db, nil)
+
+	var trieCfg *trie.Config
+	if config != nil {
+		trieCfg = &trie.Config{Zktrie: config.Scroll.ZktrieEnabled()}
+	}
+	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(rawdb.NewMemoryDatabase(), trieCfg), nil)
+	if err != nil {
+		panic(err)
+	}
+
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -317,18 +327,19 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	// We have the genesis block in database(perhaps in ancient database)
 	// but the corresponding state is missing.
 	header := rawdb.ReadHeader(db, stored, 0)
-	var trieCfg *trie.Config
 
-	if genesis == nil {
-		storedcfg := rawdb.ReadChainConfig(db, stored)
-		if storedcfg == nil {
-			log.Warn("Found genesis block without chain config")
-		} else {
-			trieCfg = &trie.Config{Zktrie: storedcfg.Scroll.ZktrieEnabled()}
-		}
-	} else {
-		trieCfg = &trie.Config{Zktrie: genesis.Config.Scroll.ZktrieEnabled()}
-	}
+	//var trieCfg *trie.Config
+	//
+	//if genesis == nil {
+	//	storedcfg := rawdb.ReadChainConfig(db, stored)
+	//	if storedcfg == nil {
+	//		log.Warn("Found genesis block without chain config")
+	//	} else {
+	//		trieCfg = &trie.Config{Zktrie: storedcfg.Scroll.ZktrieEnabled()}
+	//	}
+	//} else {
+	//	trieCfg = &trie.Config{Zktrie: genesis.Config.Scroll.ZktrieEnabled()}
+	//}
 
 	if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
 		if genesis == nil {
@@ -448,16 +459,7 @@ func (g *Genesis) configOrDefault(ghash common.Hash) *params.ChainConfig {
 // ToBlock returns the genesis block according to genesis specification.
 func (g *Genesis) ToBlock() *types.Block {
 
-	var trieCfg *trie.Config
-	if g.Config != nil {
-		trieCfg = &trie.Config{Zktrie: g.Config.Scroll.ZktrieEnabled()}
-	}
-	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithConfig(db, trieCfg), nil)
-	if err != nil {
-		panic(err)
-	}
-
-	root, err := g.Alloc.deriveHash()
+	root, err := g.Alloc.deriveHash(g.Config)
 	if err != nil {
 		panic(err)
 	}

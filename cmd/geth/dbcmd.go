@@ -78,9 +78,7 @@ Remove blockchain and state databases`,
 		Flags: flags.Merge([]cli.Flag{
 			utils.SyncModeFlag,
 			utils.ScrollAlphaFlag,
-			utils.NetworkFlags,
-			utils.DatabasePathFlags,
-		}),
+		}, utils.NetworkFlags, utils.DatabasePathFlags),
 		Usage:       "Inspect the storage size for each type of data in the database",
 		Description: `This commands iterates the entire database. If the optional 'prefix' and 'start' arguments are provided, then the iteration is limited to the given subset of data.`,
 	}
@@ -338,7 +336,7 @@ func checkStateContent(ctx *cli.Context) error {
 			errs++
 			fmt.Printf("Error at %#x\n", k)
 			fmt.Printf("  Hash:  %#x\n", got)
-			fmt.Printf("  Data:  %#x\n", v)
+			fmt.Printf("  data:  %#x\n", v)
 		}
 		if time.Since(lastLog) > 8*time.Second {
 			log.Info("Iterating the database", "at", fmt.Sprintf("%#x", k), "elapsed", common.PrettyDuration(time.Since(startTime)))

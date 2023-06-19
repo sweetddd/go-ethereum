@@ -34,7 +34,6 @@ import (
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rollup/fees"
-
 )
 
 const (
@@ -320,7 +319,7 @@ func (pool *TxPool) setNewHead(head *types.Header) {
 	next := new(big.Int).Add(head.Number, big.NewInt(1))
 	pool.istanbul = pool.config.IsIstanbul(next)
 	pool.eip2718 = pool.config.IsBerlin(next)
-	pool.shanghai = pool.config.IsShanghai(next)
+	pool.shanghai = pool.config.IsShanghaiBlock(next)
 }
 
 // Stop stops the light transaction pool

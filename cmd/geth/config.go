@@ -33,6 +33,7 @@ import (
 	"github.com/iswallet/go-ethereum/cmd/utils"
 	"github.com/iswallet/go-ethereum/eth/downloader"
 	"github.com/iswallet/go-ethereum/eth/ethconfig"
+	"github.com/iswallet/go-ethereum/internal/debug"
 	"github.com/iswallet/go-ethereum/internal/ethapi"
 	"github.com/iswallet/go-ethereum/internal/flags"
 	"github.com/iswallet/go-ethereum/internal/version"

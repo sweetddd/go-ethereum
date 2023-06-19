@@ -54,6 +54,7 @@ import (
 	"github.com/iswallet/go-ethereum/eth/filters"
 	"github.com/iswallet/go-ethereum/eth/gasprice"
 	"github.com/iswallet/go-ethereum/eth/tracers"
+	"github.com/iswallet/go-ethereum/ethclient"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/ethdb/remotedb"
 	"github.com/iswallet/go-ethereum/ethstats"
@@ -90,7 +91,7 @@ var (
 	// General settings
 	DataDirFlag = &flags.DirectoryFlag{
 		Name:     "datadir",
-		Usage:    "Data directory for the databases and keystore",
+		Usage:    "data directory for the databases and keystore",
 		Value:    flags.DirectoryString(node.DefaultDataDir()),
 		Category: flags.EthCategory,
 	}
@@ -158,9 +159,10 @@ var (
 		Category: flags.EthCategory,
 	}
 
-	ScrollAlphaFlag = cli.BoolFlag{
-		Name:  "scroll-alpha",
-		Usage: "Scroll Alpha test network",
+	ScrollAlphaFlag = &cli.BoolFlag{
+		Name:     "scroll-alpha",
+		Usage:    "Scroll Alpha test network",
+		Category: flags.EthashCategory,
 	}
 
 	// Dev mode
@@ -1054,7 +1056,7 @@ func MakeDataDir(ctx *cli.Context) string {
 		if ctx.Bool(SepoliaFlag.Name) {
 			return filepath.Join(path, "sepolia")
 		}
-		if ctx.GlobalBool(ScrollAlphaFlag.Name) {
+		if ctx.Bool(ScrollAlphaFlag.Name) {
 			return filepath.Join(path, "scroll-alpha")
 		}
 		return path
@@ -1551,19 +1553,19 @@ func unmarshalBlockNumber(input string) (rpc.BlockNumber, error) {
 
 func setL1(ctx *cli.Context, cfg *node.Config) {
 	var err error
-	if ctx.GlobalIsSet(L1EndpointFlag.Name) {
-		cfg.L1Endpoint = ctx.GlobalString(L1EndpointFlag.Name)
+	if ctx.IsSet(L1EndpointFlag.Name) {
+		cfg.L1Endpoint = ctx.String(L1EndpointFlag.Name)
 	}
-	if ctx.GlobalIsSet(L1ConfirmationsFlag.Name) {
-		cfg.L1Confirmations, err = unmarshalBlockNumber(ctx.GlobalString(L1ConfirmationsFlag.Name))
+	if ctx.IsSet(L1ConfirmationsFlag.Name) {
+		cfg.L1Confirmations, err = unmarshalBlockNumber(ctx.String(L1ConfirmationsFlag.Name))
 		if err != nil {
-			panic(fmt.Sprintf("invalid value for flag %s: %s", L1ConfirmationsFlag.Name, ctx.GlobalString(L1ConfirmationsFlag.Name)))
+			panic(fmt.Sprintf("invalid value for flag %s: %s", L1ConfirmationsFlag.Name, ctx.String(L1ConfirmationsFlag.Name)))
 		}
 	} else {
 		cfg.L1Confirmations = rpc.FinalizedBlockNumber
 	}
-	if ctx.GlobalIsSet(L1DeploymentBlockFlag.Name) {
-		cfg.L1DeploymentBlock = ctx.GlobalUint64(L1DeploymentBlockFlag.Name)
+	if ctx.IsSet(L1DeploymentBlockFlag.Name) {
+		cfg.L1DeploymentBlock = ctx.Uint64(L1DeploymentBlockFlag.Name)
 	}
 }
 
@@ -1599,7 +1601,7 @@ func SetDataDir(ctx *cli.Context, cfg *node.Config) {
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "goerli")
 	case ctx.Bool(SepoliaFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "sepolia")
-	case ctx.GlobalBool(ScrollAlphaFlag.Name) && cfg.DataDir == node.DefaultDataDir():
+	case ctx.Bool(ScrollAlphaFlag.Name) && cfg.DataDir == node.DefaultDataDir():
 		cfg.DataDir = filepath.Join(node.DefaultDataDir(), "scroll-alpha")
 	}
 }

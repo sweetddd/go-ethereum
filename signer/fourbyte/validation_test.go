@@ -87,10 +87,10 @@ func TestTransactionValidation(t *testing.T) {
 		// conflicting input and data
 		{from: "000000000000000000000000000000000000dead", to: "0x000000000000000000000000000000000000dEaD",
 			n: "0x01", g: "0x20", gp: "0x40", value: "0x01", d: "0x01", i: "0x02", expectErr: true},
-		// Data can't be parsed
+		// data can't be parsed
 		{from: "000000000000000000000000000000000000dead", to: "0x000000000000000000000000000000000000dEaD",
 			n: "0x01", g: "0x20", gp: "0x40", value: "0x01", d: "0x0102", numMessages: 1},
-		// Data (on Input) can't be parsed
+		// data (on Input) can't be parsed
 		{from: "000000000000000000000000000000000000dead", to: "0x000000000000000000000000000000000000dEaD",
 			n: "0x01", g: "0x20", gp: "0x40", value: "0x01", i: "0x0102", numMessages: 1},
 		// Send to 0

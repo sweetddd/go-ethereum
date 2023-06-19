@@ -36,7 +36,6 @@ import (
 	"github.com/iswallet/go-ethereum/metrics"
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rollup/fees"
-
 )
 
 const (
@@ -293,7 +292,7 @@ type TxPool struct {
 	wg              sync.WaitGroup // tracks loop, scheduleReorgLoop
 	initDoneCh      chan struct{}  // is closed once the pool is initialized (for tests)
 
-	spammers *prque.Prque
+	spammers *prque.Prque[int64, common.Address]
 
 	changesSinceReorg int // A counter for how many drops we've performed in-between reorg.
 }
@@ -326,7 +325,7 @@ func NewTxPool(config Config, chainconfig *params.ChainConfig, chain blockChain)
 		reorgShutdownCh: make(chan struct{}),
 		initDoneCh:      make(chan struct{}),
 		gasPrice:        new(big.Int).SetUint64(config.PriceLimit),
-		spammers:        prque.New(nil),
+		spammers:        prque.New[int64, common.Address](nil),
 	}
 	pool.locals = newAccountSet(pool.signer)
 	for _, addr := range config.Locals {
@@ -615,7 +614,7 @@ func (pool *TxPool) local() map[common.Address]types.Transactions {
 func (pool *TxPool) validateTx(tx *types.Transaction, local bool) error {
 	// No unauthenticated deposits allowed in the transaction pool.
 	if tx.IsL1MessageTx() {
-		return ErrTxTypeNotSupported
+		return core.ErrTxTypeNotSupported
 	}
 
 	// Accept only legacy transactions until EIP-2718/2930 activates.
@@ -1408,7 +1407,7 @@ func (pool *TxPool) reset(oldHead, newHead *types.Header) {
 	pool.istanbul = pool.chainconfig.IsIstanbul(next)
 	pool.eip2718 = pool.chainconfig.Scroll.EnableEIP2718 && pool.chainconfig.IsBerlin(next)
 	pool.eip1559 = pool.chainconfig.Scroll.EnableEIP1559 && pool.chainconfig.IsLondon(next)
-	pool.shanghai = pool.chainconfig.IsShanghai(next)
+	pool.shanghai = pool.chainconfig.IsShanghaiBlock(next)
 }
 
 // promoteExecutables moves transactions that have become processable from the

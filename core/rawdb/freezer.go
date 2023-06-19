@@ -74,7 +74,7 @@ type Freezer struct {
 	writeBatch *freezerBatch
 
 	readonly     bool
-	tables       map[string]*freezerTable // Data tables for storing everything
+	tables       map[string]*freezerTable // data tables for storing everything
 	instanceLock *flock.Flock             // File-system lock to prevent double opens
 	closeOnce    sync.Once
 }

@@ -23,6 +23,7 @@ package downloader
 import (
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum"
 	"math/big"
 	"sync"
 	"sync/atomic"
@@ -1410,7 +1411,7 @@ func (d *Downloader) fetchParts(deliveryCh chan dataPack, deliver func(dataPack)
 					// and latency of a peer separately, which requires pushing the measures capacity a bit and seeing
 					// how response times reacts, to it always requests one more than the minimum (i.e. min 2).
 					if fails > 2 {
-						peer.log.Trace("Data delivery timed out", "type", kind)
+						peer.log.Trace("data delivery timed out", "type", kind)
 						setIdle(peer, 0, time.Now())
 					} else {
 						peer.log.Debug("Stalling delivery, dropping", "type", kind)
@@ -1438,7 +1439,7 @@ func (d *Downloader) fetchParts(deliveryCh chan dataPack, deliver func(dataPack)
 			// If there's nothing more to fetch, wait or terminate
 			if pending() == 0 {
 				if !inFlight() && finished {
-					log.Debug("Data fetching completed", "type", kind)
+					log.Debug("data fetching completed", "type", kind)
 					return nil
 				}
 				break

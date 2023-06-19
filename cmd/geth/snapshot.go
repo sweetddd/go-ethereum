@@ -20,9 +20,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"os"
-	"time"
-
 	"github.com/iswallet/go-ethereum/cmd/utils"
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/rawdb"
@@ -31,12 +28,18 @@ import (
 	"github.com/iswallet/go-ethereum/core/state/snapshot"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/internal/flags"
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/rlp"
 	"github.com/iswallet/go-ethereum/trie"
 	cli "github.com/urfave/cli/v2"
+	"os"
+	"time"
 )
+
+// emptyKeccakCodeHash is the known hash of the empty EVM bytecode.
+var emptyKeccakCodeHash = codehash.EmptyKeccakCodeHash.Bytes()
 
 var (
 	snapshotCommand = &cli.Command{
@@ -74,7 +77,7 @@ the trie clean cache with default directory will be deleted.
 				Usage:     "Recalculate state hash based on the snapshot for verification",
 				ArgsUsage: "<root>",
 				Action:    verifyState,
-				Flags:     flags.Merge(utils.NetworkFlags, utils.DatabasePathFlags,utils.ScrollAlphaFlag,),
+				Flags:     flags.Merge([]cli.Flag{utils.ScrollAlphaFlag}, utils.NetworkFlags, utils.DatabasePathFlags),
 				Description: `
 geth snapshot verify-state <state-root>
 will traverse the whole accounts and storages set based on the specified
@@ -109,7 +112,7 @@ information about the specified address.
 				Usage:     "Traverse the state with given root hash and perform quick verification",
 				ArgsUsage: "<root>",
 				Action:    traverseState,
-				Flags:     flags.Merge(utils.NetworkFlags, utils.DatabasePathFlags,utils.ScrollAlphaFlag,),
+				Flags:     flags.Merge(utils.NetworkFlags, utils.DatabasePathFlags, []cli.Flag{utils.ScrollAlphaFlag}),
 				Description: `
 geth snapshot traverse-state <state-root>
 will traverse the whole state from the given state root and will abort if any
@@ -124,7 +127,7 @@ It's also usable without snapshot enabled.
 				Usage:     "Traverse the state with given root hash and perform detailed verification",
 				ArgsUsage: "<root>",
 				Action:    traverseRawState,
-				Flags:     flags.Merge(utils.NetworkFlags, utils.DatabasePathFlags,utils.ScrollAlphaFlag,),
+				Flags:     flags.Merge(utils.NetworkFlags, utils.DatabasePathFlags, []cli.Flag{utils.ScrollAlphaFlag}),
 				Description: `
 geth snapshot traverse-rawstate <state-root>
 will traverse the whole state from the given root and will abort if any referenced

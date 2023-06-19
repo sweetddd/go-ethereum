@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"math"
 	"os"
 	"path/filepath"
@@ -454,7 +455,7 @@ func extractGenesis(db ethdb.Database, stateBloom *stateBloom) error {
 					return storageIter.Error()
 				}
 			}
-			if !bytes.Equal(acc.KeccakCodeHash, emptyKeccakCodeHash) {
+			if !bytes.Equal(acc.KeccakCodeHash, codehash.EmptyKeccakCodeHash.Bytes()) {
 				stateBloom.Put(acc.KeccakCodeHash, nil)
 			}
 		}

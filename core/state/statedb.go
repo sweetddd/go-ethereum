@@ -620,6 +620,7 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		if metrics.EnabledExpensive {
 			s.AccountReads += time.Since(start)
 		}
+		enc, err := s.trie.TryGet(addr.Bytes())
 		if err != nil {
 			s.setError(fmt.Errorf("getDeleteStateObject (%x) error: %w", addr.Bytes(), err))
 			return nil
@@ -627,8 +628,6 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		if data == nil {
 			return nil
 		}
-
-		data = new(types.StateAccount)
 		if s.IsZktrie() {
 			data, err = types.UnmarshalStateAccount(enc)
 		} else {

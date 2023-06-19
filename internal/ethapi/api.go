@@ -40,13 +40,14 @@ import (
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/core/vm"
 	"github.com/iswallet/go-ethereum/crypto"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/eth/tracers/logger"
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/p2p"
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"github.com/iswallet/go-ethereum/rpc"
-	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -1374,7 +1375,7 @@ func RPCMarshalBlock(block *types.Block, inclTx bool, fullTx bool, config *param
 
 // rpcMarshalHeader uses the generalized output filler, then adds the total difficulty field, which requires
 // a `BlockchainAPI`.
-func (s *BlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Header, enableBaseFee bool) map[string]interface{} {
+func (s *BlockChainAPI) rpcMarshalHeader(ctx context.Context, header *types.Header) map[string]interface{} {
 	fields := RPCMarshalHeader(header, s.b.ChainConfig().Scroll.BaseFeeEnabled())
 	fields["totalDifficulty"] = (*hexutil.Big)(s.b.GetTd(ctx, header.Hash()))
 	return fields

@@ -18,7 +18,6 @@ package trie
 
 import (
 	"fmt"
-
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
@@ -35,6 +34,16 @@ var magicHash []byte = []byte("THIS IS THE MAGIC INDEX FOR ZKTRIE")
 type ZkTrie struct {
 	*zktrie.ZkTrie
 	db *ZktrieDatabase
+}
+
+func (t *ZkTrie) TryGetAccount(address common.Address) (*types.StateAccount, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (t *ZkTrie) TryDeleteAccount(address common.Address) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 func init() {
@@ -71,10 +80,16 @@ func (t *ZkTrie) Get(key []byte) []byte {
 
 // TryUpdateAccount will abstract the write of an account to the
 // secure trie.
-func (t *ZkTrie) TryUpdateAccount(key []byte, acc *types.StateAccount) error {
-	sanityCheckByte32Key(key)
+//func (t *ZkTrie) TryUpdateAccount(key []byte, acc *types.StateAccount) error {
+//	sanityCheckByte32Key(key)
+//	value, flag := acc.MarshalFields()
+//	return t.ZkTrie.TryUpdate(key, flag, value)
+//}
+
+func (t *ZkTrie) TryUpdateAccount(address common.Address, acc *types.StateAccount) error {
+	sanityCheckByte32Key(address.Bytes32())
 	value, flag := acc.MarshalFields()
-	return t.ZkTrie.TryUpdate(key, flag, value)
+	return t.ZkTrie.TryUpdate(address.Bytes32(), flag, value)
 }
 
 // Update associates key with value in the trie. Subsequent calls to
@@ -123,10 +138,29 @@ func (t *ZkTrie) GetKey(kHashBytes []byte) []byte {
 //
 // Committing flushes nodes from memory. Subsequent Get calls will load nodes
 // from the database.
-func (t *ZkTrie) Commit(LeafCallback) (common.Hash, int, error) {
-	// in current implmentation, every update of trie already writes into database
-	// so Commmit does nothing
-	return t.Hash(), 0, nil
+//func (t *ZkTrie) Commit(LeafCallback) (common.Hash, int, error) {
+//	// in current implmentation, every update of trie already writes into database
+//	// so Commmit does nothing
+//	return t.Hash(), 0, nil
+//}
+
+func (t *ZkTrie) Commit(collectLeaf bool) (common.Hash, *NodeSet) {
+	// Write all the pre-images to the actual disk database
+	//if len(t.getSecKeyCache()) > 0 {
+	//	if t.preimages != nil {
+	//		preimages := make(map[common.Hash][]byte)
+	//		for hk, key := range t.secKeyCache {
+	//			preimages[common.BytesToHash([]byte(hk))] = key
+	//		}
+	//		t.preimages.insertPreimage(preimages)
+	//	}
+	//	t.secKeyCache = make(map[string][]byte)
+	//}
+	//// Commit the trie and return its modified nodeset.
+	//return t.trie.Commit(collectLeaf)
+
+	return t.Hash(), nil
+
 }
 
 // Hash returns the root hash of SecureBinaryTrie. It does not write to the

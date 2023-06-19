@@ -18,6 +18,7 @@ package downloader
 
 import (
 	"context"
+	"github.com/iswallet/go-ethereum"
 	"sync"
 
 	"github.com/iswallet/go-ethereum/event"

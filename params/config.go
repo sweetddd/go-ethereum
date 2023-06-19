@@ -22,15 +22,16 @@ import (
 	"math/big"
 
 	"github.com/iswallet/go-ethereum/common"
+	"github.com/iswallet/go-ethereum/rollup/rcfg"
 	"golang.org/x/crypto/sha3"
 )
 
 // Genesis hashes to enforce below configs on.
 var (
-	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
-	SepoliaGenesisHash = common.HexToHash("0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9")
-	RinkebyGenesisHash = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
-	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
+	MainnetGenesisHash     = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3")
+	SepoliaGenesisHash     = common.HexToHash("0x25a5cc106eea7138acab33231d7160d69cb777ee0c2c553fcddf5138993e6dd9")
+	RinkebyGenesisHash     = common.HexToHash("0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177")
+	GoerliGenesisHash      = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 	ScrollAlphaGenesisHash = common.HexToHash("0xa4fc62b9b0643e345bdcebe457b3ae898bef59c7203c3db269200055e037afda")
 )
 
@@ -284,8 +285,8 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
-		ArchimedesBlock: big.NewInt(0),
-		ShanghaiBlock: nil,
+		ArchimedesBlock:               big.NewInt(0),
+		ShanghaiBlock:                 nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -296,11 +297,11 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		Scroll: ScrollConfig{
-			UseZktrie:       false,
-			FeeVaultAddress: nil,
-			EnableEIP2718:   true,
-			EnableEIP1559:   true,
-			MaxTxPerBlock:   nil,
+			UseZktrie:                 false,
+			FeeVaultAddress:           nil,
+			EnableEIP2718:             true,
+			EnableEIP1559:             true,
+			MaxTxPerBlock:             nil,
 			MaxTxPayloadBytesPerBlock: nil,
 			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
@@ -325,8 +326,8 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             nil,
-		ArchimedesBlock: big.NewInt(0),
-		ShanghaiBlock: nil,
+		ArchimedesBlock:               big.NewInt(0),
+		ShanghaiBlock:                 nil,
 		GrayGlacierBlock:              nil,
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -337,11 +338,11 @@ var (
 		Ethash:                        nil,
 		Clique:                        &CliqueConfig{Period: 0, Epoch: 30000},
 		Scroll: ScrollConfig{
-			UseZktrie:       false,
-			FeeVaultAddress: nil,
-			EnableEIP2718:   true,
-			EnableEIP1559:   true,
-			MaxTxPerBlock:   nil,
+			UseZktrie:                 false,
+			FeeVaultAddress:           nil,
+			EnableEIP2718:             true,
+			EnableEIP1559:             true,
+			MaxTxPerBlock:             nil,
 			MaxTxPayloadBytesPerBlock: nil,
 			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
@@ -366,8 +367,8 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
-		ArchimedesBlock: big.NewInt(0),
-		ShanghaiBlock: nil,
+		ArchimedesBlock:               big.NewInt(0),
+		ShanghaiBlock:                 nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -378,11 +379,11 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		Scroll: ScrollConfig{
-			UseZktrie:       false,
-			FeeVaultAddress: &common.Address{123},
-			EnableEIP2718:   true,
-			EnableEIP1559:   true,
-			MaxTxPerBlock:   nil,
+			UseZktrie:                 false,
+			FeeVaultAddress:           &common.Address{123},
+			EnableEIP2718:             true,
+			EnableEIP1559:             true,
+			MaxTxPerBlock:             nil,
 			MaxTxPayloadBytesPerBlock: nil,
 			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
@@ -436,8 +437,8 @@ var (
 		BerlinBlock:                   big.NewInt(0),
 		LondonBlock:                   big.NewInt(0),
 		ArrowGlacierBlock:             big.NewInt(0),
-		ArchimedesBlock: big.NewInt(0),
-		ShanghaiBlock: nil,
+		ArchimedesBlock:               big.NewInt(0),
+		ShanghaiBlock:                 nil,
 		GrayGlacierBlock:              big.NewInt(0),
 		MergeNetsplitBlock:            nil,
 		ShanghaiTime:                  nil,
@@ -448,11 +449,11 @@ var (
 		Ethash:                        new(EthashConfig),
 		Clique:                        nil,
 		Scroll: ScrollConfig{
-			UseZktrie:       false,
-			FeeVaultAddress: nil,
-			EnableEIP2718:   true,
-			EnableEIP1559:   true,
-			MaxTxPerBlock:   nil,
+			UseZktrie:                 false,
+			FeeVaultAddress:           nil,
+			EnableEIP2718:             true,
+			EnableEIP1559:             true,
+			MaxTxPerBlock:             nil,
 			MaxTxPayloadBytesPerBlock: nil,
 			L1Config:                  &L1Config{5, common.HexToAddress("0x0000000000000000000000000000000000000000"), 0},
 		},
@@ -732,7 +733,7 @@ func (c *ChainConfig) Description() string {
 	if c.ShanghaiBlock != nil {
 		banner += fmt.Sprintf(" - Shanghai:               #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/Shanghai.md)\n", c.ShanghaiBlock)
 	}
-	banner+=fmt.Sprintf(" - Scroll config: %v \n",c.Scroll)
+	banner += fmt.Sprintf(" - Scroll config: %v \n", c.Scroll)
 	if c.GrayGlacierBlock != nil {
 		banner += fmt.Sprintf(" - Gray Glacier:                #%-8v (https://github.com/ethereum/execution-specs/blob/master/network-upgrades/mainnet-upgrades/gray-glacier.md)\n", c.GrayGlacierBlock)
 	}
@@ -842,12 +843,12 @@ func (c *ChainConfig) IsGrayGlacier(num *big.Int) bool {
 
 // IsArchimedes returns whether num is either equal to the Archimedes fork block or greater.
 func (c *ChainConfig) IsArchimedes(num *big.Int) bool {
-	return isForked(c.ArchimedesBlock, num)
+	return isBlockForked(c.ArchimedesBlock, num)
 }
 
-// IsShanghai returns whether num is either equal to the Shanghai fork block or greater.
-func (c *ChainConfig) IsShanghai(num *big.Int) bool {
-	return isForked(c.ShanghaiBlock, num)
+// IsShanghaiBlock returns whether num is either equal to the Shanghai fork block or greater.
+func (c *ChainConfig) IsShanghaiBlock(num *big.Int) bool {
+	return isBlockForked(c.ShanghaiBlock, num)
 }
 
 // IsTerminalPoWBlock returns whether the given block is the last block of PoW stage.
@@ -871,11 +872,6 @@ func (c *ChainConfig) IsCancun(time uint64) bool {
 // IsPrague returns whether num is either equal to the Prague fork time or greater.
 func (c *ChainConfig) IsPrague(time uint64) bool {
 	return isTimestampForked(c.PragueTime, time)
-}
-
-// IsValidTxCount returns whether the given block's transaction count is below the limit.
-func (c *ChainConfig) IsValidTxCount(count int) bool {
-	return c.MaxTxPerBlock == nil || count <= *c.MaxTxPerBlock
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
@@ -1025,7 +1021,7 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, headNumber *big.Int, 
 	if isForkBlockIncompatible(c.ArchimedesBlock, newcfg.ArchimedesBlock, headNumber) {
 		return newBlockCompatError("Archimedes fork block", c.ArchimedesBlock, newcfg.ArchimedesBlock)
 	}
-	if isForkBlockIncompatible(c.ShanghaiBlock, newcfg.ShanghaiBlock, head) {
+	if isForkBlockIncompatible(c.ShanghaiBlock, newcfg.ShanghaiBlock, headNumber) {
 		return newBlockCompatError("Shanghai fork block", c.ShanghaiBlock, newcfg.ShanghaiBlock)
 	}
 	if isForkBlockIncompatible(c.GrayGlacierBlock, newcfg.GrayGlacierBlock, headNumber) {
@@ -1186,8 +1182,8 @@ type Rules struct {
 	ChainID                                                 *big.Int
 	IsHomestead, IsEIP150, IsEIP155, IsEIP158               bool
 	IsByzantium, IsConstantinople, IsPetersburg, IsIstanbul bool
-	IsBerlin, IsLondon                                      bool
-	IsMerge, IsShanghai, isCancun, isPrague, IsArchimedes                 bool
+	IsBerlin, IsLondon, IsShanghaiBlock                     bool
+	IsMerge, IsShanghai, isCancun, isPrague, IsArchimedes   bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -1209,7 +1205,7 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsBerlin:         c.IsBerlin(num),
 		IsLondon:         c.IsLondon(num),
 		IsArchimedes:     c.IsArchimedes(num),
-		IsShanghai:       c.IsShanghai(num),
+		IsShanghaiBlock:  c.IsShanghaiBlock(num),
 		IsMerge:          isMerge,
 		IsShanghai:       c.IsShanghai(timestamp),
 		isCancun:         c.IsCancun(timestamp),

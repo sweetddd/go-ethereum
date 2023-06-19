@@ -17,7 +17,7 @@ type ZktrieDatabase struct {
 	prefix []byte
 }
 
-func NewZktrieDatabase(diskdb ethdb.KeyValueStore) *ZktrieDatabase {
+func NewZktrieDatabase(diskdb ethdb.Database) *ZktrieDatabase {
 	return &ZktrieDatabase{db: NewDatabase(diskdb), prefix: []byte{}}
 }
 

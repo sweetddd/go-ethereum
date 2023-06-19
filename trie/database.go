@@ -76,17 +76,17 @@ type Database struct {
 	rawDirties KvMap
 
 	cleans  *fastcache.Cache            // GC friendly memory cache of clean node RLPs
-	dirties map[common.Hash]*cachedNode // Data and references relationships of dirty trie nodes
+	dirties map[common.Hash]*cachedNode // data and references relationships of dirty trie nodes
 	oldest  common.Hash                 // Oldest tracked node, flush-list head
 	newest  common.Hash                 // Newest tracked node, flush-list tail
 
 	gctime  time.Duration      // Time spent on garbage collection since last commit
 	gcnodes uint64             // Nodes garbage collected since last commit
-	gcsize  common.StorageSize // Data storage garbage collected since last commit
+	gcsize  common.StorageSize // data storage garbage collected since last commit
 
 	flushtime  time.Duration      // Time spent on data flushing since last commit
 	flushnodes uint64             // Nodes flushed since last commit
-	flushsize  common.StorageSize // Data storage flushed since last commit
+	flushsize  common.StorageSize // data storage flushed since last commit
 
 	dirtiesSize  common.StorageSize // Storage size of the dirty node cache (exc. metadata)
 	childrenSize common.StorageSize // Storage size of the external children tracking
@@ -306,7 +306,7 @@ func NewDatabaseWithConfig(diskdb ethdb.Database, config *Config) *Database {
 			children: make(map[common.Hash]uint16),
 		}},
 		rawDirties: make(KvMap),
-		preimages: preimage,
+		preimages:  preimage,
 	}
 	return db
 }
@@ -949,6 +949,6 @@ func (db *Database) EmptyRoot() common.Hash {
 	if db.Zktrie {
 		return common.Hash{}
 	} else {
-		return emptyRoot
+		return types.EmptyRootHash
 	}
 }

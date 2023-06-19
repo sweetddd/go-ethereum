@@ -105,7 +105,7 @@ func (api *SignerAPI) determineSignatureFormat(ctx context.Context, contentType 
 
 	switch mediaType {
 	case apitypes.IntendedValidator.Mime:
-		// Data with an intended validator
+		// data with an intended validator
 		validatorData, err := UnmarshalValidatorData(data)
 		if err != nil {
 			return nil, useEthereumV, err

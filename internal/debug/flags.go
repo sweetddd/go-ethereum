@@ -109,10 +109,10 @@ var (
 		Category: flags.LoggingCategory,
 	}
 	// mpt witness settings
-	mptWitnessFlag = cli.IntFlag{
+	mptWitnessFlag = &cli.StringFlag{
 		Name:  "trace.mptwitness",
 		Usage: "Output witness for mpt circuit with Specified order (default = no output, 1 = by executing order",
-		Value: 0,
+		Value: flags.LoggingCategory,
 	}
 )
 
@@ -154,8 +154,8 @@ type TraceConfig struct {
 
 func ConfigTrace(ctx *cli.Context) *TraceConfig {
 	cfg := new(TraceConfig)
-	cfg.TracePath = ctx.GlobalString(traceFlag.Name)
-	cfg.MPTWitness = ctx.GlobalInt(mptWitnessFlag.Name)
+	cfg.TracePath = ctx.String(traceFlag.Name)
+	cfg.MPTWitness = ctx.Int(mptWitnessFlag.Name)
 
 	return cfg
 }

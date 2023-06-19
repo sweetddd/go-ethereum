@@ -56,7 +56,7 @@ const DefaultPrompt = "> "
 // Config is the collection of configurations to fine tune the behavior of the
 // JavaScript console.
 type Config struct {
-	DataDir  string              // Data directory to store the console history at
+	DataDir  string              // data directory to store the console history at
 	DocRoot  string              // Filesystem path from where to load JavaScript files from
 	Client   *rpc.Client         // RPC client to execute Ethereum requests through
 	Prompt   string              // Input prompt prefix string (defaults to DefaultPrompt)

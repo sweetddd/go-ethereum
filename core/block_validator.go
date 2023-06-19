@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/iswallet/go-ethereum/consensus"
+	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/state"
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/params"
@@ -63,7 +64,6 @@ func (v *BlockValidator) ValidateBody(block *types.Block) error {
 	if !v.config.Scroll.IsValidBlockSize(block.PayloadSize()) {
 		return ErrInvalidBlockPayloadSize
 	}
-
 
 	// Header validity is known at this point. Here we verify that uncles, transactions
 	// and withdrawals given in the block body match the header.

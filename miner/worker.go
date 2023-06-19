@@ -19,7 +19,7 @@ package miner
 import (
 	"errors"
 	"fmt"
-	"github.com/iswallet/go-ethereum/core/vm"
+	"github.com/iswallet/go-ethereum/core/rawdb"
 	"math/big"
 	"sync"
 	"sync/atomic"
@@ -94,15 +94,15 @@ type environment struct {
 	ancestors mapset.Set[common.Hash] // ancestor set (used for checking uncle parent validity)
 	family    mapset.Set[common.Hash] // family set (used for checking uncle invalidity)
 	tcount    int                     // tx count in cycle
-	blockSize common.StorageSize // approximate size of tx payload in bytes
-	l1TxCount int                // l1 msg count in cycle
+	blockSize common.StorageSize      // approximate size of tx payload in bytes
+	l1TxCount int                     // l1 msg count in cycle
 	gasPool   *core.GasPool           // available gas used to pack transactions
 	coinbase  common.Address
 
-	header           *types.Header
-	txs              []*types.Transaction
-	receipts         []*types.Receipt
-	uncles           map[common.Hash]*types.Header
+	header   *types.Header
+	txs      []*types.Transaction
+	receipts []*types.Receipt
+	uncles   map[common.Hash]*types.Header
 }
 
 // copy creates a deep copy of environment.
@@ -859,7 +859,7 @@ func (w *worker) makeEnv(parent *types.Header, header *types.Header, coinbase co
 		family:    mapset.NewSet[common.Hash](),
 		header:    header,
 		uncles:    make(map[common.Hash]*types.Header),
-		}
+	}
 	// when 08 is processed ancestors contain 07 (quick block)
 	for _, ancestor := range w.chain.GetBlocksFromHash(parent.Hash(), 7) {
 		for _, uncle := range ancestor.Uncles() {
@@ -919,7 +919,6 @@ func (w *worker) commitTransaction(env *environment, tx *types.Transaction) ([]*
 		gp   = env.gasPool.Gas()
 	)
 
-
 	receipt, err := core.ApplyTransaction(w.chainConfig, w.chain, &env.coinbase, env.gasPool, env.state, env.header, tx, &env.header.GasUsed, *w.chain.GetVMConfig())
 	if err != nil {
 		env.state.RevertToSnapshot(snap)
@@ -962,7 +961,7 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 		if tx == nil {
 			break
 		}
-		if !w.chainConfig.Scroll.IsValidBlockSize(w.current.blockSize + tx.Size()) {
+		if !w.chainConfig.Scroll.IsValidBlockSize(w.current.blockSize + common.StorageSize(tx.Size())) {
 			log.Trace("Block size limit reached", "have", w.current.blockSize, "want", w.chainConfig.Scroll.MaxTxPayloadBytesPerBlock, "tx", tx.Size())
 			txs.Pop() // skip transactions from this account
 			continue
@@ -1006,7 +1005,7 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 				w.current.l1TxCount++
 			}
 			env.tcount++
-			env.blockSize += tx.Size()
+			env.blockSize += common.StorageSize(tx.Size())
 
 			txs.Shift()
 
@@ -1107,7 +1106,7 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 	// Set baseFee and GasLimit if we are on an EIP-1559 chain
 	if w.chainConfig.IsLondon(header.Number) {
 		if w.chainConfig.Scroll.BaseFeeEnabled() {
-			header.BaseFee = misc.CalcBaseFee(w.chainConfig, parent.Header())
+			header.BaseFee = misc.CalcBaseFee(w.chainConfig, parent)
 		} else {
 			// When disabling EIP-2718 or EIP-1559, we do not set baseFeePerGas in RPC response.
 			// Setting BaseFee as nil here can help outside SDK calculates l2geth's RLP encoding,
@@ -1177,7 +1176,6 @@ func (w *worker) fillTransactions(interrupt *int32, env *environment) error {
 		}
 	}
 
-
 	// Split the pending transactions into locals and remotes
 	// Fill the block with all available pending transactions.
 	pending := w.eth.TxPool().Pending(true)
@@ -1190,9 +1188,9 @@ func (w *worker) fillTransactions(interrupt *int32, env *environment) error {
 	}
 	if w.chainConfig.Scroll.ShouldIncludeL1Messages() && len(l1Txs) > 0 {
 		log.Trace("Processing L1 messages for inclusion", "count", pendingL1Txs)
-		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, l1Txs, header.BaseFee)
-		if w.commitTransactions(txs, w.coinbase, interrupt) {
-			return
+		txs := types.NewTransactionsByPriceAndNonce(w.current.signer, l1Txs, env.header.BaseFee)
+		if err := w.commitTransactions(env, txs, interrupt); err != nil {
+			return err
 		}
 	}
 	if len(localTxs) > 0 {

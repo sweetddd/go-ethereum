@@ -19,13 +19,13 @@ package trie
 import (
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"sync"
 
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/common/prque"
 	"github.com/iswallet/go-ethereum/core/rawdb"
 	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto/codehash"
 	"github.com/iswallet/go-ethereum/ethdb"
 	"github.com/iswallet/go-ethereum/log"
 )
@@ -96,7 +96,7 @@ type LeafCallback func(keys [][]byte, path []byte, leaf []byte, parent common.Ha
 type nodeRequest struct {
 	hash common.Hash // Hash of the trie node to retrieve
 	path []byte      // Merkle path leading to this node for prioritization
-	data []byte      // Data content of the node, cached until all subtrees complete
+	data []byte      // data content of the node, cached until all subtrees complete
 
 	parent   *nodeRequest // Parent state node referencing this entry
 	deps     int          // Number of dependencies before allowed to commit this node
@@ -107,7 +107,7 @@ type nodeRequest struct {
 type codeRequest struct {
 	hash    common.Hash    // Hash of the contract bytecode to retrieve
 	path    []byte         // Merkle path leading to this node for prioritization
-	data    []byte         // Data content of the node, cached until all subtrees complete
+	data    []byte         // data content of the node, cached until all subtrees complete
 	parents []*nodeRequest // Parent state nodes referencing this entry (notify all upon completion)
 }
 
@@ -219,7 +219,7 @@ func (s *Sync) AddSubTrie(root common.Hash, path []byte, parent common.Hash, par
 // as is.
 func (s *Sync) AddCodeEntry(hash common.Hash, path []byte, parent common.Hash, parentPath []byte) {
 	// Short circuit if the entry is empty or already known
-	if hash == EmptyKeccakCodeHash {
+	if hash == codehash.EmptyKeccakCodeHash {
 		return
 	}
 	if s.membatch.hasCode(hash) {

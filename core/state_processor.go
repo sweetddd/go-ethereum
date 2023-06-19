@@ -28,6 +28,7 @@ import (
 	"github.com/iswallet/go-ethereum/core/vm"
 	"github.com/iswallet/go-ethereum/crypto"
 	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 )
 
 // StateProcessor is a basic Processor, which takes care of transitioning

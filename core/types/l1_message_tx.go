@@ -52,3 +52,8 @@ func (tx *L1MessageTx) rawSignatureValues() (v, r, s *big.Int) {
 func (tx *L1MessageTx) setSignatureValues(chainID, v, r, s *big.Int) {
 	// this is a noop for l1 message transactions
 }
+
+func (tx *L1MessageTx) effectiveGasPrice(dst *big.Int, baseFee *big.Int) *big.Int {
+	//TODO implement me
+	panic("implement me")
+}

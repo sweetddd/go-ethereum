@@ -63,7 +63,7 @@ const schema string = `
         account(block: Long): Account!
         # Topics is a list of 0-4 indexed topics for the log.
         topics: [Bytes32!]!
-        # Data is unindexed data for this log.
+        # data is unindexed data for this log.
         data: Bytes!
         # Transaction is the transaction that generated this log entry.
         transaction: Transaction!
@@ -265,13 +265,13 @@ const schema string = `
         maxPriorityFeePerGas: BigInt
         # Value is the value, in wei, sent along with the call.
         value: BigInt
-        # Data is the data sent to the callee.
+        # data is the data sent to the callee.
         data: Bytes
     }
 
     # CallResult is the result of a local call operation.
     type CallResult {
-        # Data is the return data of the called contract.
+        # data is the return data of the called contract.
         data: Bytes!
         # GasUsed is the amount of gas used by the call, after any refunds.
         gasUsed: Long!

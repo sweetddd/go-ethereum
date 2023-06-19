@@ -20,6 +20,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"math/big"
 	"sync"
 	"time"
@@ -841,13 +843,6 @@ func (b *SimulatedBackend) AdjustTime(adjustment time.Duration) error {
 func (b *SimulatedBackend) Blockchain() *core.BlockChain {
 	return b.blockchain
 }
-
-// callMsg implements core.Message to allow passing it as a transaction simulator.
-type callMsg struct {
-	ethereum.CallMsg
-}
-
-func (m callMsg) IsL1MessageTx() bool
 
 // filterBackend implements filters.Backend to support filtering for logs without
 // taking bloom-bits acceleration structures into account.

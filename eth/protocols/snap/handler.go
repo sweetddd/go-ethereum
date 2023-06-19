@@ -23,7 +23,6 @@ import (
 
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/light"
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/metrics"

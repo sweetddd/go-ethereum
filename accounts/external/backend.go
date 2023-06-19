@@ -18,6 +18,7 @@ package external
 
 import (
 	"fmt"
+	"github.com/iswallet/go-ethereum"
 	"math/big"
 	"sync"
 

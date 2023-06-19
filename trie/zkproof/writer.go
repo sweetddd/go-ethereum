@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/iswallet/go-ethereum/ethdb"
 	"math/big"
 
 	zktrie "github.com/scroll-tech/zktrie/trie"
@@ -12,7 +14,6 @@ import (
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/common/hexutil"
 	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/ethdb/memorydb"
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/trie"
 )
@@ -41,7 +42,7 @@ func addressToKey(addr common.Address) *zkt.Hash {
 }
 
 // resume the proof bytes into db and return the leaf node
-func resumeProofs(proof []hexutil.Bytes, db *memorydb.Database) *zktrie.Node {
+func resumeProofs(proof []hexutil.Bytes, db ethdb.Database) *zktrie.Node {
 	for _, buf := range proof {
 
 		n, err := zktrie.DecodeSMTProof(buf)
@@ -151,7 +152,8 @@ func (wr *zktrieProofWriter) TracingAccounts() map[common.Address]*types.StateAc
 
 func NewZkTrieProofWriter(storage *types.StorageTrace) (*zktrieProofWriter, error) {
 
-	underlayerDb := memorydb.New()
+	//underlayerDb := memorydb.New()
+	underlayerDb := rawdb.NewMemoryDatabase()
 	zkDb := trie.NewZktrieDatabase(underlayerDb)
 
 	accounts := make(map[common.Address]*types.StateAccount)
@@ -429,7 +431,7 @@ func (w *zktrieProofWriter) traceAccountUpdate(addr common.Address, updateAccDat
 	}
 
 	if accData != nil {
-		if err := w.tracingZktrie.TryUpdateAccount(addr.Bytes32(), accData); err != nil {
+		if err := w.tracingZktrie.TryUpdateAccount(addr, accData); err != nil {
 			return nil, fmt.Errorf("update zktrie account state fail: %s", err)
 		}
 		w.tracingAccounts[addr] = accData

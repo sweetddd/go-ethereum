@@ -1,6 +1,7 @@
 package trie
 
 import (
+	"github.com/iswallet/go-ethereum/core/rawdb"
 	"math/big"
 	"testing"
 
@@ -14,7 +15,6 @@ import (
 
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/ethdb/memorydb"
 )
 
 // we do not need zktrie impl anymore, only made a wrapper for adapting testing
@@ -106,7 +106,7 @@ type Fatalable interface {
 }
 
 func newTestingMerkle(f Fatalable, numLevels int) *zkTrieImplTestWrapper {
-	mt, err := newZkTrieImpl(NewZktrieDatabase((memorydb.New())), numLevels)
+	mt, err := newZkTrieImpl(NewZktrieDatabase(rawdb.NewMemoryDatabase()), numLevels)
 	if err != nil {
 		f.Fatal(err)
 		return nil

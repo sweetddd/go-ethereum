@@ -84,7 +84,7 @@ var (
 	// transitionStatusKey tracks the eth2 transition status.
 	transitionStatusKey = []byte("eth2-transition")
 
-	// Data item prefixes (use single byte to avoid mixing data types, avoid `i`, used for indexes).
+	// data item prefixes (use single byte to avoid mixing data types, avoid `i`, used for indexes).
 	headerPrefix       = []byte("h") // headerPrefix + num (uint64 big endian) + hash -> header
 	headerTDSuffix     = []byte("t") // headerPrefix + num (uint64 big endian) + hash + headerTDSuffix -> td
 	headerHashSuffix   = []byte("n") // headerPrefix + num (uint64 big endian) + headerHashSuffix -> hash
@@ -270,4 +270,3 @@ func L1MessageKey(queueIndex uint64) []byte {
 func FirstQueueIndexNotInL2BlockKey(l2BlockHash common.Hash) []byte {
 	return append(firstQueueIndexNotInL2BlockPrefix, l2BlockHash.Bytes()...)
 }
-

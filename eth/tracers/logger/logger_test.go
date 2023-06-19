@@ -17,6 +17,7 @@
 package logger
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -87,6 +88,9 @@ func TestStoreCapture(t *testing.T) {
 // Tests that blank fields don't appear in logs when JSON marshalled, to reduce
 // logs bloat and confusion. See https://github.com/ethereum/go-ethereum/issues/24487
 func TestStructLogMarshalingOmitEmpty(t *testing.T) {
+
+	mem := bytes.Buffer{}
+	mem.Grow(2)
 	tests := []struct {
 		name string
 		log  *StructLog
@@ -96,9 +100,9 @@ func TestStructLogMarshalingOmitEmpty(t *testing.T) {
 			`{"pc":0,"op":0,"gas":"0x0","gasCost":"0x0","memSize":0,"stack":null,"depth":0,"refund":0,"opName":"STOP"}`},
 		{"with err", &StructLog{Err: fmt.Errorf("this failed")},
 			`{"pc":0,"op":0,"gas":"0x0","gasCost":"0x0","memSize":0,"stack":null,"depth":0,"refund":0,"opName":"STOP","error":"this failed"}`},
-		{"with mem", &StructLog{Memory: make([]byte, 2), MemorySize: 2},
+		{"with mem", &StructLog{Memory: mem, MemorySize: 2},
 			`{"pc":0,"op":0,"gas":"0x0","gasCost":"0x0","memory":"0x0000","memSize":2,"stack":null,"depth":0,"refund":0,"opName":"STOP"}`},
-		{"with 0-size mem", &StructLog{Memory: make([]byte, 0)},
+		{"with 0-size mem", &StructLog{Memory: bytes.Buffer{}},
 			`{"pc":0,"op":0,"gas":"0x0","gasCost":"0x0","memSize":0,"stack":null,"depth":0,"refund":0,"opName":"STOP"}`},
 	}
 

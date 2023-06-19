@@ -25,6 +25,7 @@ import (
 	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/core/vm"
 	"github.com/iswallet/go-ethereum/params"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 )
 
 // statePrefetcher is a basic Prefetcher, which blindly executes a block on top

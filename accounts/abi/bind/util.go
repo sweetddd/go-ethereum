@@ -19,6 +19,7 @@ package bind
 import (
 	"context"
 	"errors"
+	"github.com/iswallet/go-ethereum"
 	"time"
 
 	"github.com/iswallet/go-ethereum/common"

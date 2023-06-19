@@ -20,6 +20,7 @@ package usbwallet
 import (
 	"context"
 	"fmt"
+	"github.com/iswallet/go-ethereum"
 	"io"
 	"math/big"
 	"sync"

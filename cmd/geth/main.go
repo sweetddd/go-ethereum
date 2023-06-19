@@ -139,7 +139,7 @@ var (
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
 		utils.DeveloperGasLimitFlag,
-		utils.ScrollAlphaFlag,
+		//utils.ScrollAlphaFlag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
@@ -150,9 +150,9 @@ var (
 		utils.GpoMaxGasPriceFlag,
 		utils.GpoIgnoreGasPriceFlag,
 		utils.MinerNotifyFullFlag,
-		utils.L1EndpointFlag,
-		utils.L1ConfirmationsFlag,
-		utils.L1DeploymentBlockFlag,
+		//utils.L1EndpointFlag,
+		//utils.L1ConfirmationsFlag,
+		//utils.L1DeploymentBlockFlag,
 		configFileFlag,
 	}, utils.NetworkFlags, utils.DatabasePathFlags)
 
@@ -289,7 +289,6 @@ func prepare(ctx *cli.Context) {
 	case ctx.IsSet(utils.ScrollAlphaFlag.Name):
 		log.Info("Starting l2geth on Scroll Alpha testnet...")
 
-
 	case ctx.IsSet(utils.DeveloperFlag.Name):
 		log.Info("Starting Geth in ephemeral dev mode...")
 		log.Warn(`You are running Geth in --dev mode. Please note the following:
@@ -318,7 +317,7 @@ func prepare(ctx *cli.Context) {
 			!ctx.IsSet(utils.RinkebyFlag.Name) &&
 			!ctx.IsSet(utils.GoerliFlag.Name) &&
 			!ctx.IsSet(utils.ScrollAlphaFlag.Name) &&
-			!ctx.IsSet(utils.DeveloperFlag.Name){
+			!ctx.IsSet(utils.DeveloperFlag.Name) {
 			// Nope, we're really on mainnet. Bump that cache up!
 			log.Info("Bumping default cache on mainnet", "provided", ctx.Int(utils.CacheFlag.Name), "updated", 4096)
 			ctx.Set(utils.CacheFlag.Name, strconv.Itoa(4096))

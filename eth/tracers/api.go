@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"runtime"
 	"sync"
@@ -42,6 +43,7 @@ import (
 	"github.com/iswallet/go-ethereum/log"
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"github.com/iswallet/go-ethereum/rpc"
 )
 
@@ -845,7 +847,7 @@ func (api *API) standardTraceBlockToFile(ctx context.Context, block *types.Block
 		statedb.SetTxContext(tx.Hash(), i)
 		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
 		if err == nil {
-			_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit),l1DataFee)
+			_, err = core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit), l1DataFee)
 		}
 		if writer != nil {
 			writer.Flush()
@@ -991,7 +993,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 // traceTx configures a new tracer according to the provided configuration, and
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
-func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Context, vmctx vm.BlockContext, statedb *state.StateDB, config *TraceConfig,l1DataFee *big.Int) (interface{}, error) {
+func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Context, vmctx vm.BlockContext, statedb *state.StateDB, config *TraceConfig, l1DataFee *big.Int) (interface{}, error) {
 	var (
 		tracer    Tracer
 		err       error
@@ -1035,7 +1037,7 @@ func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Conte
 
 	// Call Prepare to clear out the statedb access list
 	statedb.SetTxContext(txctx.TxHash, txctx.TxIndex)
-	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit),  l1DataFee); err != nil {
+	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit), l1DataFee); err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
 	return tracer.GetResult()

@@ -306,7 +306,7 @@ func (w *trezorDriver) trezorExchange(req proto.Message, results ...proto.Messag
 			payload = nil
 		}
 		// Send over to the device
-		w.log.Trace("Data chunk sent to the Trezor", "chunk", hexutil.Bytes(chunk))
+		w.log.Trace("data chunk sent to the Trezor", "chunk", hexutil.Bytes(chunk))
 		if _, err := w.device.Write(chunk); err != nil {
 			return 0, err
 		}
@@ -321,7 +321,7 @@ func (w *trezorDriver) trezorExchange(req proto.Message, results ...proto.Messag
 		if _, err := io.ReadFull(w.device, chunk); err != nil {
 			return 0, err
 		}
-		w.log.Trace("Data chunk received from the Trezor", "chunk", hexutil.Bytes(chunk))
+		w.log.Trace("data chunk received from the Trezor", "chunk", hexutil.Bytes(chunk))
 
 		// Make sure the transport header matches
 		if chunk[0] != 0x3f || (len(reply) == 0 && (chunk[1] != 0x23 || chunk[2] != 0x23)) {

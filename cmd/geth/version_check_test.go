@@ -48,7 +48,7 @@ func TestVerification(t *testing.T) {
 }
 
 func testVerification(t *testing.T, pubkey, sigdir string) {
-	// Data to verify
+	// data to verify
 	data, err := os.ReadFile("./testdata/vcheck/data.json")
 	if err != nil {
 		t.Fatal(err)
