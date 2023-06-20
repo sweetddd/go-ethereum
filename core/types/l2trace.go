@@ -1,26 +1,11 @@
 package types
 
 import (
-	"encoding/json"
-	"math/big"
-	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/common"
 	"github.com/iswallet/go-ethereum/common/hexutil"
-
+	"github.com/iswallet/go-ethereum/params"
+	"math/big"
 )
-
-// BlockTrace contains block execution traces and results required for rollers.
-type BlockTrace struct {
-	ChainID          uint64             `json:"chainID"`
-	Version          string             `json:"version"`
-	Coinbase         *AccountWrapper    `json:"coinbase"`
-	Header           *Header            `json:"header"`
-	Transactions     []*TransactionData `json:"transactions"`
-	StorageTrace     *StorageTrace      `json:"storageTrace"`
-	ExecutionResults []*ExecutionResult `json:"executionResults"`
-	MPTWitness       *json.RawMessage   `json:"mptwitness,omitempty"`
-	WithdrawTrieRoot common.Hash        `json:"withdraw_trie_root,omitempty"`
-}
 
 // StorageTrace stores proofs of storage needed by storage circuit
 type StorageTrace struct {

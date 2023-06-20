@@ -115,6 +115,11 @@ type flatCallTracer struct {
 	activePrecompiles []common.Address // Updated on CaptureStart based on given rules
 }
 
+func (t *flatCallTracer) CaptureStateAfter(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 type flatCallTracerConfig struct {
 	ConvertParityErrors bool `json:"convertParityErrors"` // If true, call tracer converts errors to parity format
 	IncludePrecompiles  bool `json:"includePrecompiles"`  // If true, call tracer includes calls to precompiled contracts

@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/iswallet/go-ethereum"
+	"github.com/iswallet/go-ethereum/core/types/trace"
 	"math/big"
 
 	"github.com/iswallet/go-ethereum/common"
@@ -324,19 +325,19 @@ func (ec *Client) SubscribeNewHead(ctx context.Context, ch chan<- *types.Header)
 }
 
 // GetBlockTraceByHash returns the BlockTrace given the block hash.
-func (ec *Client) GetBlockTraceByHash(ctx context.Context, blockHash common.Hash) (*types.BlockTrace, error) {
-	blockTrace := &types.BlockTrace{}
+func (ec *Client) GetBlockTraceByHash(ctx context.Context, blockHash common.Hash) (*trace.BlockTrace, error) {
+	blockTrace := &trace.BlockTrace{}
 	return blockTrace, ec.c.CallContext(ctx, &blockTrace, "scroll_getBlockTraceByNumberOrHash", blockHash)
 }
 
 // GetBlockTraceByNumber returns the BlockTrace given the block number.
-func (ec *Client) GetBlockTraceByNumber(ctx context.Context, number *big.Int) (*types.BlockTrace, error) {
-	blockTrace := &types.BlockTrace{}
+func (ec *Client) GetBlockTraceByNumber(ctx context.Context, number *big.Int) (*trace.BlockTrace, error) {
+	blockTrace := &trace.BlockTrace{}
 	return blockTrace, ec.c.CallContext(ctx, &blockTrace, "scroll_getBlockTraceByNumberOrHash", toBlockNumArg(number))
 }
 
 // SubscribeNewBlockTrace subscribes to block execution trace when a new block is created.
-func (ec *Client) SubscribeNewBlockTrace(ctx context.Context, ch chan<- *types.BlockTrace) (ethereum.Subscription, error) {
+func (ec *Client) SubscribeNewBlockTrace(ctx context.Context, ch chan<- *trace.BlockTrace) (ethereum.Subscription, error) {
 	return ec.c.EthSubscribe(ctx, ch, "newBlockTrace")
 }
 

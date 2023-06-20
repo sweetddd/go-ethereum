@@ -3,12 +3,12 @@ package utesting
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/iswallet/go-ethereum/core/types/trace"
 	"io"
 	"os"
 	"testing"
 
 	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
 	"github.com/iswallet/go-ethereum/trie/zkproof"
 )
 
@@ -22,7 +22,7 @@ func init() {
 	}
 }
 
-func loadStaff(t *testing.T, fname string) *types.BlockTrace {
+func loadStaff(t *testing.T, fname string) *trace.BlockTrace {
 	f, err := os.Open(fname)
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +33,7 @@ func loadStaff(t *testing.T, fname string) *types.BlockTrace {
 		t.Fatal(err)
 	}
 
-	out := new(types.BlockTrace)
+	out := new(trace.BlockTrace)
 
 	err = json.Unmarshal(bt, out)
 	if err != nil {

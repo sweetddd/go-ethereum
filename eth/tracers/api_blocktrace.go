@@ -5,6 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/core/types/trace"
+	"github.com/iswallet/go-ethereum/eth/tracers/logger"
 	"runtime"
 	"sync"
 
@@ -24,7 +26,7 @@ import (
 )
 
 type TraceBlock interface {
-	GetBlockTraceByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (trace *types.BlockTrace, err error)
+	GetBlockTraceByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (trace *trace.BlockTrace, err error)
 }
 
 type traceEnv struct {
@@ -46,11 +48,11 @@ type traceEnv struct {
 	*types.StorageTrace
 	// zktrie tracer is used for zktrie storage to build additional deletion proof
 	zkTrieTracer     map[string]state.ZktrieProofTracer
-	executionResults []*types.ExecutionResult
+	executionResults []*logger.ExecutionResult
 }
 
 // GetBlockTraceByNumberOrHash replays the block and returns the structured BlockTrace by hash or number.
-func (api *API) GetBlockTraceByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (trace *types.BlockTrace, err error) {
+func (api *API) GetBlockTraceByNumberOrHash(ctx context.Context, blockNrOrHash rpc.BlockNumberOrHash, config *TraceConfig) (trace *trace.BlockTrace, err error) {
 	var block *types.Block
 	if number, ok := blockNrOrHash.Number(); ok {
 		block, err = api.blockByNumber(ctx, number)
@@ -66,7 +68,7 @@ func (api *API) GetBlockTraceByNumberOrHash(ctx context.Context, blockNrOrHash r
 	}
 	if config == nil {
 		config = &TraceConfig{
-			LogConfig: &vm.LogConfig{
+			Config: &logger.Config{
 				EnableMemory:     false,
 				EnableReturnData: true,
 			},
@@ -95,10 +97,11 @@ func (api *API) createTraceEnv(ctx context.Context, config *TraceConfig, block *
 	if config != nil && config.Reexec != nil {
 		reexec = *config.Reexec
 	}
-	statedb, err := api.backend.StateAtBlock(ctx, parent, reexec, nil, true, true)
+	statedb, release, err := api.backend.StateAtBlock(ctx, parent, reexec, nil, true, true)
 	if err != nil {
 		return nil, err
 	}
+	defer release()
 
 	// get coinbase
 	var coinbase common.Address
@@ -124,7 +127,7 @@ func (api *API) createTraceEnv(ctx context.Context, config *TraceConfig, block *
 			StorageProofs: make(map[string]map[string][]hexutil.Bytes),
 		},
 		zkTrieTracer:     make(map[string]state.ZktrieProofTracer),
-		executionResults: make([]*types.ExecutionResult, block.Transactions().Len()),
+		executionResults: make([]*logger.ExecutionResult, block.Transactions().Len()),
 	}
 
 	key := coinbase.String()
@@ -144,7 +147,7 @@ func (api *API) createTraceEnv(ctx context.Context, config *TraceConfig, block *
 	return env, nil
 }
 
-func (api *API) getBlockTrace(block *types.Block, env *traceEnv) (*types.BlockTrace, error) {
+func (api *API) getBlockTrace(block *types.Block, env *traceEnv) (*trace.BlockTrace, error) {
 	// Execute all the transaction contained within the block concurrently
 	var (
 		txs   = block.Transactions()
@@ -180,8 +183,8 @@ func (api *API) getBlockTrace(block *types.Block, env *traceEnv) (*types.BlockTr
 		jobs <- &txTraceTask{statedb: env.state.Copy(), index: i}
 
 		// Generate the next state snapshot fast without tracing
-		msg, _ := tx.AsMessage(env.signer, block.BaseFee())
-		env.state.Prepare(tx.Hash(), i)
+		msg, _ := core.TransactionToMessage(tx, env.signer, block.BaseFee())
+		env.state.SetTxContext(tx.Hash(), i)
 		vmenv := vm.NewEVM(env.blockCtx, core.NewEVMTxContext(msg), env.state, api.backend.ChainConfig(), vm.Config{})
 		l1DataFee, err := fees.CalculateL1DataFee(tx, env.state)
 		if err != nil {
@@ -226,7 +229,7 @@ func (api *API) getBlockTrace(block *types.Block, env *traceEnv) (*types.BlockTr
 
 func (api *API) getTxResult(env *traceEnv, state *state.StateDB, index int, block *types.Block) error {
 	tx := block.Transactions()[index]
-	msg, _ := tx.AsMessage(env.signer, block.BaseFee())
+	msg, _ := core.TransactionToMessage(tx, env.signer, block.BaseFee())
 	from, _ := types.Sender(env.signer, tx)
 	to := tx.To()
 
@@ -256,12 +259,12 @@ func (api *API) getTxResult(env *traceEnv, state *state.StateDB, index int, bloc
 		}
 	}
 
-	tracer := vm.NewStructLogger(env.config.LogConfig)
+	tracer := logger.NewStructLogger(env.config.Config)
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(env.blockCtx, core.NewEVMTxContext(msg), state, api.backend.ChainConfig(), vm.Config{Debug: true, Tracer: tracer, NoBaseFee: true})
 
 	// Call Prepare to clear out the statedb access list
-	state.Prepare(txctx.TxHash, txctx.TxIndex)
+	state.SetTxContext(txctx.TxHash, txctx.TxIndex)
 
 	// Computes the new state by applying the given message.
 	l1DataFee, err := fees.CalculateL1DataFee(tx, state)
@@ -326,7 +329,7 @@ func (api *API) getTxResult(env *traceEnv, state *state.StateDB, index int, bloc
 	}
 
 	proofStorages := tracer.UpdatedStorages()
-	proofStorages[rcfg.L1GasPriceOracleAddress] = vm.Storage(
+	proofStorages[rcfg.L1GasPriceOracleAddress] = logger.Storage(
 		map[common.Hash]common.Hash{
 			rcfg.L1BaseFeeSlot: {}, // notice we do not need the right value here
 			rcfg.OverheadSlot:  {},
@@ -394,7 +397,7 @@ func (api *API) getTxResult(env *traceEnv, state *state.StateDB, index int, bloc
 		}
 	}
 
-	env.executionResults[index] = &types.ExecutionResult{
+	env.executionResults[index] = &logger.ExecutionResult{
 		From:           sender,
 		To:             receiver,
 		AccountCreated: createdAcc,
@@ -403,14 +406,14 @@ func (api *API) getTxResult(env *traceEnv, state *state.StateDB, index int, bloc
 		Gas:            result.UsedGas,
 		Failed:         result.Failed(),
 		ReturnValue:    fmt.Sprintf("%x", returnVal),
-		StructLogs:     vm.FormatLogs(tracer.StructLogs()),
+		StructLogs:     logger.FormatLogs(tracer.StructLogs()),
 	}
 
 	return nil
 }
 
 // Fill blockTrace content after all the txs are finished running.
-func (api *API) fillBlockTrace(env *traceEnv, block *types.Block) (*types.BlockTrace, error) {
+func (api *API) fillBlockTrace(env *traceEnv, block *types.Block) (*trace.BlockTrace, error) {
 	statedb := env.state
 
 	txs := make([]*types.TransactionData, block.Transactions().Len())
@@ -447,7 +450,7 @@ func (api *API) fillBlockTrace(env *traceEnv, block *types.Block) (*types.BlockT
 		}
 	}
 
-	blockTrace := &types.BlockTrace{
+	blockTrace := &trace.BlockTrace{
 		ChainID: api.backend.ChainConfig().ChainID.Uint64(),
 		Version: params.ArchiveVersion(params.CommitHash),
 		Coinbase: &types.AccountWrapper{

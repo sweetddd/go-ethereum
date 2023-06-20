@@ -166,6 +166,61 @@ type Message struct {
 	IsL1MessageTx     bool
 }
 
+func (m Message) FromImpl() common.Address {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) ToImpl() *common.Address {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) GasPriceImpl() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) Gas() uint64 {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) GasFeeCapImpl() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) GasTipCapImpl() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) ValueImpl() *big.Int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) NonceImpl() uint64 {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) DataImpl() []byte {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) AccessListImpl() types.AccessList {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (m Message) IsL1MessageTxImpl() bool {
+	//TODO implement me
+	panic("implement me")
+}
+
 // TransactionToMessage converts a transaction into a Message.
 func TransactionToMessage(tx *types.Transaction, s types.Signer, baseFee *big.Int) (*Message, error) {
 	msg := &Message{

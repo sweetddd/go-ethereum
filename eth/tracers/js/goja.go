@@ -252,8 +252,16 @@ func (t *jsTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Addr
 	// Update list of precompiles based on current block
 	rules := env.ChainConfig().Rules(env.Context.BlockNumber, env.Context.Random != nil, env.Context.Time)
 	t.activePrecompiles = vm.ActivePrecompiles(rules)
-	isShanghai := env.ChainConfig().IsShanghai(env.Context.BlockNumber)
-	intrinsicGas, err := core.IntrinsicGas(input, nil, t.ctx["type"] == "CREATE", isHomestead, isIstanbul, isShanghai)
+
+	// Compute intrinsic gas
+	isHomestead := env.ChainConfig().IsHomestead(env.Context.BlockNumber)
+	isIstanbul := env.ChainConfig().IsIstanbul(env.Context.BlockNumber)
+	isShanghai := env.ChainConfig().IsShanghaiBlock(env.Context.BlockNumber)
+	intrinsicGas, err := core.IntrinsicGas(input, nil, t.ctx["type"] == t.vm.ToValue("CREATE"), isHomestead, isIstanbul, isShanghai)
+	if err != nil {
+		return
+	}
+	t.ctx["intrinsicGas"] = t.vm.ToValue(intrinsicGas)
 }
 
 // CaptureState implements the Tracer interface to trace a single step of VM execution.

@@ -18,6 +18,7 @@ package t8ntool
 
 import (
 	"fmt"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"math/big"
 	"os"
 
@@ -186,7 +187,7 @@ func (pre *Prestate) Apply(vmConfig vm.Config, chainConfig *params.ChainConfig,
 
 		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
 		if err != nil {
-			log.Info("rejected tx due to fees.CalculateL1DataFee", "index", i, "hash", tx.Hash(), "from", msg.From(), "error", err)
+			log.Info("rejected tx due to fees.CalculateL1DataFee", "index", i, "hash", tx.Hash(), "from", msg.From, "error", err)
 			rejectedTxs = append(rejectedTxs, &rejectedTx{i, err.Error()})
 			continue
 		}

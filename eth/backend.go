@@ -56,9 +56,8 @@ import (
 	"github.com/iswallet/go-ethereum/p2p/enode"
 	"github.com/iswallet/go-ethereum/params"
 	"github.com/iswallet/go-ethereum/rlp"
-	"github.com/iswallet/go-ethereum/rpc"
 	"github.com/iswallet/go-ethereum/rollup/sync_service"
-
+	"github.com/iswallet/go-ethereum/rpc"
 )
 
 // Config contains the configuration options of the ETH protocol.
@@ -215,7 +214,7 @@ func New(stack *node.Node, config *ethconfig.Config, l1Client sync_service.EthCl
 	eth.txPool = txpool.NewTxPool(config.TxPool, eth.blockchain.Config(), eth.blockchain)
 
 	// initialize and start L1 message sync service
-	eth.syncService, err = sync_service.NewSyncService(context.Background(), chainConfig, stack.Config(), eth.chainDb, l1Client)
+	eth.syncService, err = sync_service.NewSyncService(context.Background(), eth.blockchain.Config(), stack.Config(), eth.chainDb, l1Client)
 	if err != nil {
 		return nil, fmt.Errorf("cannot initialize L1 sync service: %w", err)
 	}
@@ -325,7 +324,7 @@ func (s *Ethereum) APIs() []rpc.API {
 		}, {
 			Namespace: "net",
 			Service:   s.netRPCService,
-		},{
+		}, {
 			Namespace: "scroll",
 			Service:   NewScrollAPI(s),
 		},
@@ -481,20 +480,20 @@ func (s *Ethereum) StopMining() {
 func (s *Ethereum) IsMining() bool      { return s.miner.Mining() }
 func (s *Ethereum) Miner() *miner.Miner { return s.miner }
 
-func (s *Ethereum) AccountManager() *accounts.Manager  { return s.accountManager }
-func (s *Ethereum) BlockChain() *core.BlockChain       { return s.blockchain }
-func (s *Ethereum) TxPool() *txpool.TxPool             { return s.txPool }
-func (s *Ethereum) EventMux() *event.TypeMux           { return s.eventMux }
-func (s *Ethereum) Engine() consensus.Engine           { return s.engine }
-func (s *Ethereum) ChainDb() ethdb.Database            { return s.chainDb }
-func (s *Ethereum) IsListening() bool                  { return true } // Always listening
-func (s *Ethereum) Downloader() *downloader.Downloader { return s.handler.downloader }
-func (s *Ethereum) Synced() bool                       { return atomic.LoadUint32(&s.handler.acceptTxs) == 1 }
-func (s *Ethereum) SetSynced()                         { atomic.StoreUint32(&s.handler.acceptTxs, 1) }
-func (s *Ethereum) ArchiveMode() bool                  { return s.config.NoPruning }
-func (s *Ethereum) BloomIndexer() *core.ChainIndexer   { return s.bloomIndexer }
+func (s *Ethereum) AccountManager() *accounts.Manager      { return s.accountManager }
+func (s *Ethereum) BlockChain() *core.BlockChain           { return s.blockchain }
+func (s *Ethereum) TxPool() *txpool.TxPool                 { return s.txPool }
+func (s *Ethereum) EventMux() *event.TypeMux               { return s.eventMux }
+func (s *Ethereum) Engine() consensus.Engine               { return s.engine }
+func (s *Ethereum) ChainDb() ethdb.Database                { return s.chainDb }
+func (s *Ethereum) IsListening() bool                      { return true } // Always listening
+func (s *Ethereum) Downloader() *downloader.Downloader     { return s.handler.downloader }
+func (s *Ethereum) Synced() bool                           { return atomic.LoadUint32(&s.handler.acceptTxs) == 1 }
+func (s *Ethereum) SetSynced()                             { atomic.StoreUint32(&s.handler.acceptTxs, 1) }
+func (s *Ethereum) ArchiveMode() bool                      { return s.config.NoPruning }
+func (s *Ethereum) BloomIndexer() *core.ChainIndexer       { return s.bloomIndexer }
 func (s *Ethereum) SyncService() *sync_service.SyncService { return s.syncService }
-func (s *Ethereum) Merger() *consensus.Merger          { return s.merger }
+func (s *Ethereum) Merger() *consensus.Merger              { return s.merger }
 func (s *Ethereum) SyncMode() downloader.SyncMode {
 	mode, _ := s.handler.chainSync.modeAndLocalHead()
 	return mode

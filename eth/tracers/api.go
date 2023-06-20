@@ -570,15 +570,12 @@ func (api *API) IntermediateRoots(ctx context.Context, hash common.Hash, config 
 			txContext = core.NewEVMTxContext(msg)
 			vmenv     = vm.NewEVM(vmctx, txContext, statedb, chainConfig, vm.Config{})
 		)
-		statedb.Prepare(tx.Hash(), i)
-
+		statedb.SetTxContext(tx.Hash(), i)
 		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
 		if err != nil {
 			log.Warn("Tracing intermediate roots did not complete due to fees.CalculateL1DataFee", "txindex", i, "txhash", tx.Hash(), "err", err)
 			return nil, err
 		}
-
-		statedb.SetTxContext(tx.Hash(), i)
 		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(msg.GasLimit), l1DataFee); err != nil {
 			log.Warn("Tracing intermediate roots did not complete", "txindex", i, "txhash", tx.Hash(), "err", err)
 			// We intentionally don't return the error here: if we do, then the RPC server will not
@@ -655,7 +652,13 @@ func (api *API) traceBlock(ctx context.Context, block *types.Block, config *Trac
 			TxIndex:     i,
 			TxHash:      tx.Hash(),
 		}
-		res, err := api.traceTx(ctx, msg, txctx, blockCtx, statedb, config)
+
+		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
+		if err != nil {
+			return nil, err
+		}
+
+		res, err := api.traceTx(ctx, msg, txctx, blockCtx, statedb, config, l1DataFee)
 		if err != nil {
 			return nil, err
 		}
@@ -1031,30 +1034,30 @@ func (api *API) traceTx(ctx context.Context, message *core.Message, txctx *Conte
 	defer cancel()
 
 	// If gasPrice is 0, make sure that the account has sufficient balance to cover `l1DataFee`.
-	if message.GasPrice().Cmp(big.NewInt(0)) == 0 {
-		statedb.AddBalance(message.From(), l1DataFee)
+	if message.GasPrice.Cmp(big.NewInt(0)) == 0 {
+		statedb.AddBalance(message.From, l1DataFee)
 	}
 
 	// Call Prepare to clear out the statedb access list
 	statedb.SetTxContext(txctx.TxHash, txctx.TxIndex)
-	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit), l1DataFee); err != nil {
+	result, err := core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.GasLimit), l1DataFee)
+	if err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
-	return tracer.GetResult()
 
 	// Depending on the tracer type, format and return the output.
 	switch tracer := tracer.(type) {
-	case *vm.StructLogger:
+	case *logger.StructLogger:
 		// If the result contains a revert reason, return it.
 		returnVal := fmt.Sprintf("%x", result.Return())
 		if len(result.Revert()) > 0 {
 			returnVal = fmt.Sprintf("%x", result.Revert())
 		}
-		return &types.ExecutionResult{
+		return &logger.ExecutionResult{
 			Gas:         result.UsedGas,
 			Failed:      result.Failed(),
 			ReturnValue: returnVal,
-			StructLogs:  vm.FormatLogs(tracer.StructLogs()),
+			StructLogs:  logger.FormatLogs(tracer.StructLogs()),
 			L1DataFee:   (*hexutil.Big)(result.L1DataFee),
 		}, nil
 

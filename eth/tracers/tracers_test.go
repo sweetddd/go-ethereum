@@ -17,6 +17,7 @@
 package tracers
 
 import (
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"math/big"
 	"testing"
 

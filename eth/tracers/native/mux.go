@@ -36,6 +36,11 @@ type muxTracer struct {
 	tracers []tracers.Tracer
 }
 
+func (t *muxTracer) CaptureStateAfter(pc uint64, op vm.OpCode, gas, cost uint64, scope *vm.ScopeContext, rData []byte, depth int, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // newMuxTracer returns a new mux tracer.
 func newMuxTracer(ctx *tracers.Context, cfg json.RawMessage) (tracers.Tracer, error) {
 	var config map[string]json.RawMessage

@@ -21,6 +21,7 @@ package filters
 import (
 	"context"
 	"fmt"
+	"github.com/iswallet/go-ethereum"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -178,15 +179,15 @@ const (
 )
 
 type subscription struct {
-	id           rpc.ID
-	typ          Type
-	created      time.Time
-	logsCrit     ethereum.FilterQuery
-	logs         chan []*types.Log
-	txs          chan []*types.Transaction
-	headers      chan *types.Header
-	installed    chan struct{} // closed when the filter is installed
-	err          chan error    // closed when the filter is uninstalled
+	id        rpc.ID
+	typ       Type
+	created   time.Time
+	logsCrit  ethereum.FilterQuery
+	logs      chan []*types.Log
+	txs       chan []*types.Transaction
+	headers   chan *types.Header
+	installed chan struct{} // closed when the filter is installed
+	err       chan error    // closed when the filter is uninstalled
 }
 
 // EventSystem creates subscriptions, processes events and broadcasts them to the

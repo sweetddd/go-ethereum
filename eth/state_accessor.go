@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"time"
 
 	"github.com/iswallet/go-ethereum/common"
@@ -224,9 +225,9 @@ func (eth *Ethereum) stateAtTransaction(ctx context.Context, block *types.Block,
 
 		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
 		if err != nil {
-			return nil, vm.BlockContext{}, nil, err
+			return nil, vm.BlockContext{}, nil, nil, err
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas()),l1DataFee); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas()), l1DataFee); err != nil {
 			return nil, vm.BlockContext{}, nil, nil, fmt.Errorf("transaction %#x failed: %v", tx.Hash(), err)
 		}
 		// Ensure any modifications are committed to the state
