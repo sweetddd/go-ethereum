@@ -3,6 +3,8 @@ package tracers
 import (
 	"context"
 	"encoding/json"
+	"github.com/iswallet/go-ethereum/core/types/trace"
+	"github.com/iswallet/go-ethereum/eth/tracers/logger"
 	"math/big"
 	"testing"
 
@@ -120,7 +122,7 @@ func verifyProof(t *testing.T, expect [][]byte, actual []hexutil.Bytes) {
 	}
 }
 
-func checkChainAndProof(t *testing.T, b *testBackend, parent *types.Block, block *types.Block, blockTrace *types.BlockTrace) {
+func checkChainAndProof(t *testing.T, b *testBackend, parent *types.Block, block *types.Block, blockTrace *trace.BlockTrace) {
 	assert.Equal(t, parent.Hash(), block.ParentHash())
 	storgeTrace := blockTrace.StorageTrace
 	assert.Equal(t, parent.Root().String(), storgeTrace.RootBefore.String())
@@ -159,7 +161,7 @@ func checkTxs(t *testing.T, expect []*types.Transaction, actual []*types.Transac
 	}
 }
 
-func checkStructLogs(t *testing.T, expect []*txTraceResult, actual []*types.ExecutionResult) {
+func checkStructLogs(t *testing.T, expect []*txTraceResult, actual []*logger.ExecutionResult) {
 	// assert executionResults
 	assert.Equal(t, len(expect), len(actual))
 	for i, val := range expect {

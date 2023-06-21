@@ -1292,8 +1292,14 @@ func (w *worker) commitWork(interrupt *int32, noempty bool, timestamp int64) {
 	}
 
 	// do not produce empty blocks
-	if w.current.tcount == 0 {
-		return
+	if w.current != nil {
+		if w.current.tcount == 0 {
+			return
+		}
+	} else {
+		if work.tcount == 0 {
+			return
+		}
 	}
 
 	// Submit the generated block for consensus sealing.

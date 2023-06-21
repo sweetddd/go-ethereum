@@ -1079,9 +1079,7 @@ func APIs(backend Backend) []rpc.API {
 		},
 		{
 			Namespace: "scroll",
-			Version:   "1.0",
 			Service:   TraceBlock(NewAPI(backend)),
-			Public:    true,
 		},
 	}
 }

@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/iswallet/go-ethereum/rollup/fees"
 	"math/big"
 	"reflect"
 	"sort"
@@ -184,9 +185,9 @@ func (b *testBackend) StateAtTransaction(ctx context.Context, block *types.Block
 		vmenv := vm.NewEVM(context, txContext, statedb, b.chainConfig, vm.Config{})
 		l1DataFee, err := fees.CalculateL1DataFee(tx, statedb)
 		if err != nil {
-			return nil, vm.BlockContext{}, nil, err
+			return nil, vm.BlockContext{}, nil, nil, err
 		}
-		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas()),l1DataFee); err != nil {
+		if _, err := core.ApplyMessage(vmenv, msg, new(core.GasPool).AddGas(tx.Gas()), l1DataFee); err != nil {
 			return nil, vm.BlockContext{}, nil, nil, fmt.Errorf("transaction %#x failed: %v", tx.Hash(), err)
 		}
 		statedb.Finalise(vmenv.ChainConfig().IsEIP158(block.Number()))
@@ -236,13 +237,6 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
-			expect: &types.ExecutionResult{
-				L1DataFee:   (*hexutil.Big)(big.NewInt(0)),
-				Gas:         params.TxGas,
-				Failed:      false,
-				ReturnValue: "",
-				StructLogs:  []*types.StructLogRes{},
-			},
 		},
 		// Standard JSON trace upon the head, plain transfer.
 		{
@@ -255,13 +249,6 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
-			expect: &types.ExecutionResult{
-				L1DataFee:   (*hexutil.Big)(big.NewInt(0)),
-				Gas:         params.TxGas,
-				Failed:      false,
-				ReturnValue: "",
-				StructLogs:  []*types.StructLogRes{},
-			},
 		},
 		// Standard JSON trace upon the non-existent block, error expects
 		{
@@ -286,13 +273,6 @@ func TestTraceCall(t *testing.T) {
 			config:    nil,
 			expectErr: nil,
 			expect:    `{"gas":21000,"failed":false,"returnValue":"","structLogs":[]}`,
-			expect: &types.ExecutionResult{
-				L1DataFee:   (*hexutil.Big)(big.NewInt(0)),
-				Gas:         params.TxGas,
-				Failed:      false,
-				ReturnValue: "",
-				StructLogs:  []*types.StructLogRes{},
-			},
 		},
 		// Tracing on 'pending' should fail:
 		{
@@ -318,13 +298,6 @@ func TestTraceCall(t *testing.T) {
 			expect: ` {"gas":53018,"failed":false,"returnValue":"","structLogs":[
 		{"pc":0,"op":"NUMBER","gas":24946984,"gasCost":2,"depth":1,"stack":[]},
 		{"pc":1,"op":"STOP","gas":24946982,"gasCost":0,"depth":1,"stack":["0x1337"]}]}`,
-			expect: &types.ExecutionResult{
-				L1DataFee:   (*hexutil.Big)(big.NewInt(0)),
-				Gas:         params.TxGas,
-				Failed:      false,
-				ReturnValue: "",
-				StructLogs:  []*types.StructLogRes{},
-			},
 		},
 	}
 	for i, testspec := range testSuite {
@@ -390,11 +363,11 @@ func TestTraceTransaction(t *testing.T) {
 		t.Errorf("failed to unmarshal result %v", err)
 	}
 	if !reflect.DeepEqual(have, &logger.ExecutionResult{
-		L1DataFee:       (*hexutil.Big)(big.NewInt(0)),
+		L1DataFee:   (*hexutil.Big)(big.NewInt(0)),
 		Gas:         params.TxGas,
 		Failed:      false,
 		ReturnValue: "",
-		StructLogs:  []logger.StructLogRes{},
+		StructLogs:  []*logger.StructLogRes{},
 	}) {
 		t.Error("Transaction tracing result is different")
 	}

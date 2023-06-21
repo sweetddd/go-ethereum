@@ -20,6 +20,7 @@ package gethclient
 import (
 	"context"
 	"encoding/json"
+	"github.com/iswallet/go-ethereum"
 	"math/big"
 	"runtime"
 	"runtime/debug"
@@ -116,15 +117,15 @@ func (ec *Client) GetProof(ctx context.Context, account common.Address, keys []s
 		})
 	}
 	result := AccountResult{
-		Address:      res.Address,
-		AccountProof: res.AccountProof,
-		Balance:      res.Balance.ToInt(),
-		Nonce:        uint64(res.Nonce),
+		Address:          res.Address,
+		AccountProof:     res.AccountProof,
+		Balance:          res.Balance.ToInt(),
+		Nonce:            uint64(res.Nonce),
 		KeccakCodeHash:   res.KeccakCodeHash,
 		PoseidonCodeHash: res.PoseidonCodeHash,
 		CodeSize:         res.CodeSize,
-		StorageHash:  res.StorageHash,
-		StorageProof: storageResults,
+		StorageHash:      res.StorageHash,
+		StorageProof:     storageResults,
 	}
 	return &result, err
 }
