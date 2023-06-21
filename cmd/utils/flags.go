@@ -1022,15 +1022,15 @@ var (
 	}
 
 	// L1Settings
-	L1EndpointFlag = cli.StringFlag{
+	L1EndpointFlag = &cli.StringFlag{
 		Name:  "l1.endpoint",
 		Usage: "Endpoint of L1 HTTP-RPC server",
 	}
-	L1ConfirmationsFlag = cli.StringFlag{
+	L1ConfirmationsFlag = &cli.StringFlag{
 		Name:  "l1.confirmations",
 		Usage: "Number of confirmations on L1 needed for finalization, or \"safe\" or \"finalized\"",
 	}
-	L1DeploymentBlockFlag = cli.Int64Flag{
+	L1DeploymentBlockFlag = &cli.Int64Flag{
 		Name:  "l1.sync.startblock",
 		Usage: "L1 block height to start syncing from. Should be set to the L1 message queue deployment block number.",
 	}

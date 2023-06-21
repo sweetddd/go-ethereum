@@ -37,13 +37,19 @@ type ZkTrie struct {
 }
 
 func (t *ZkTrie) TryGetAccount(address common.Address) (*types.StateAccount, error) {
-	//TODO implement me
-	panic("implement me")
+
+	sanityCheckByte32Key(address.Bytes32())
+
+	v, err := t.ZkTrie.TryGet(address.Bytes())
+	if err != nil {
+		return nil, err
+	}
+
+	return types.UnmarshalStateAccount(v)
 }
 
 func (t *ZkTrie) TryDeleteAccount(address common.Address) error {
-	//TODO implement me
-	panic("implement me")
+	return t.ZkTrie.TryDelete(address.Bytes32())
 }
 
 func init() {

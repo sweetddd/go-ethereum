@@ -139,7 +139,7 @@ var (
 		utils.DeveloperFlag,
 		utils.DeveloperPeriodFlag,
 		utils.DeveloperGasLimitFlag,
-		//utils.ScrollAlphaFlag,
+		utils.ScrollAlphaFlag,
 		utils.VMEnableDebugFlag,
 		utils.NetworkIdFlag,
 		utils.EthStatsURLFlag,
@@ -150,9 +150,9 @@ var (
 		utils.GpoMaxGasPriceFlag,
 		utils.GpoIgnoreGasPriceFlag,
 		utils.MinerNotifyFullFlag,
-		//utils.L1EndpointFlag,
-		//utils.L1ConfirmationsFlag,
-		//utils.L1DeploymentBlockFlag,
+		utils.L1EndpointFlag,
+		utils.L1ConfirmationsFlag,
+		utils.L1DeploymentBlockFlag,
 		configFileFlag,
 	}, utils.NetworkFlags, utils.DatabasePathFlags)
 
