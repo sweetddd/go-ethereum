@@ -5,11 +5,11 @@ import (
 
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	zktrie "github.com/iswallet/go-ethereum/trie"
+	zktrie "github.com/ethereum/go-ethereum/trie"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb"
 )
 
 type TrieProve interface {

@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"os/exec"
@@ -35,7 +34,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/pkg/reexec"
-	"github.com/iswallet/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func NewTestCmd(t *testing.T, data interface{}) *TestCmd {

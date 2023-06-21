@@ -33,8 +33,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 type storageItem struct{ Key, Value *big.Int }

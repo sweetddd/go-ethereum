@@ -3,13 +3,13 @@ package utesting
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/iswallet/go-ethereum/core/types/trace"
+	"github.com/ethereum/go-ethereum/core/types/trace"
 	"io"
 	"os"
 	"testing"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/trie/zkproof"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/trie/zkproof"
 )
 
 func init() {

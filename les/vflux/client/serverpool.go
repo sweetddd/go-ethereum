@@ -24,15 +24,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/iswallet/go-ethereum/common/mclock"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/les/utils"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/metrics"
-	"github.com/iswallet/go-ethereum/p2p/enode"
-	"github.com/iswallet/go-ethereum/p2p/enr"
-	"github.com/iswallet/go-ethereum/p2p/nodestate"
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/common/mclock"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/les/utils"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/p2p/nodestate"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 const (

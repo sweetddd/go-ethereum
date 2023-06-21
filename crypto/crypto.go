@@ -29,9 +29,9 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/math"
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/rlp"
 	"golang.org/x/crypto/sha3"
 )
 

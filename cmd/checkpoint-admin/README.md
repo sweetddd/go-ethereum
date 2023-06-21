@@ -35,7 +35,7 @@ Checkpoint-admin is a command line tool designed for checkpoint oracle. Users ca
 #### Install
 
 ```shell
-go get github.com/iswallet/go-ethereum/cmd/checkpoint-admin
+go get github.com/ethereum/go-ethereum/cmd/checkpoint-admin
 ```
 
 #### Deploy

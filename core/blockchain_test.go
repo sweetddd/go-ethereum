@@ -19,28 +19,28 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"math/big"
 	"math/rand"
 	"os"
 	"sync"
 	"testing"
 	"time"
-	"github.com/stretchr/testify/assert"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/math"
-	"github.com/iswallet/go-ethereum/consensus"
-	"github.com/iswallet/go-ethereum/consensus/beacon"
-	"github.com/iswallet/go-ethereum/consensus/ethash"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/state"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/core/vm"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/eth/tracers/logger"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/params"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/consensus/beacon"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 // So we can deterministically seed different blockchains
@@ -3890,7 +3890,6 @@ func TestFeeVault(t *testing.T) {
 		t.Fatalf("fee vault balance incorrect: expected %d, got %d", expected, actual)
 	}
 }
-
 
 // Tests the scenario the chain is requested to another point with the missing state.
 // It expects the state is recovered and all relevant chain markers are set correctly.

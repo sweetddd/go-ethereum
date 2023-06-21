@@ -28,16 +28,16 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/gofrs/flock"
-	"github.com/iswallet/go-ethereum/accounts"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/hexutil"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/event"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/p2p"
-	"github.com/iswallet/go-ethereum/rpc"
 )
 
 // Node is a container on which services can be registered.

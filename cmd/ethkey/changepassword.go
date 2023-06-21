@@ -21,8 +21,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/iswallet/go-ethereum/accounts/keystore"
-	"github.com/iswallet/go-ethereum/cmd/utils"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
+	"github.com/ethereum/go-ethereum/cmd/utils"
 	"github.com/urfave/cli/v2"
 )
 

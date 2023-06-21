@@ -28,7 +28,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/iswallet/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 var (

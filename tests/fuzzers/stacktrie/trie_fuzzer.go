@@ -25,11 +25,11 @@ import (
 	"io"
 	"sort"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
 )
 

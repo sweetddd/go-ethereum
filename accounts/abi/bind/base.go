@@ -20,16 +20,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/iswallet/go-ethereum"
+	"github.com/ethereum/go-ethereum"
 	"math/big"
 	"strings"
 	"sync"
 
-	"github.com/iswallet/go-ethereum/accounts/abi"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/event"
 )
 
 const basefeeWiggleMultiplier = 2

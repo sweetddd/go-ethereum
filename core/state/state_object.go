@@ -23,13 +23,13 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/crypto/codehash"
-	"github.com/iswallet/go-ethereum/metrics"
-	"github.com/iswallet/go-ethereum/rlp"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/crypto/codehash"
+	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 var emptyPoseidonCodeHash = codehash.EmptyPoseidonCodeHash.Bytes()
@@ -326,8 +326,6 @@ func (s *stateObject) updateTrie(db Database) (Trie, error) {
 				// Encoding []byte cannot fail, ok to ignore the error.
 				v, _ = rlp.EncodeToBytes(common.TrimLeftZeroes(value[:]))
 			}
-
-
 
 			s.db.StorageUpdated += 1
 		}

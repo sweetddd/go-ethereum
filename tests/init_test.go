@@ -29,7 +29,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iswallet/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 var (

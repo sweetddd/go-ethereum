@@ -30,8 +30,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/rs/cors"
 )
 

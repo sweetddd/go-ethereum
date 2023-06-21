@@ -28,24 +28,24 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iswallet/go-ethereum/beacon/engine"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/hexutil"
-	"github.com/iswallet/go-ethereum/consensus"
-	beaconConsensus "github.com/iswallet/go-ethereum/consensus/beacon"
-	"github.com/iswallet/go-ethereum/consensus/ethash"
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/eth"
-	"github.com/iswallet/go-ethereum/eth/downloader"
-	"github.com/iswallet/go-ethereum/eth/ethconfig"
-	"github.com/iswallet/go-ethereum/miner"
-	"github.com/iswallet/go-ethereum/node"
-	"github.com/iswallet/go-ethereum/p2p"
-	"github.com/iswallet/go-ethereum/params"
-	"github.com/iswallet/go-ethereum/rpc"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/beacon/engine"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus"
+	beaconConsensus "github.com/ethereum/go-ethereum/consensus/beacon"
+	"github.com/ethereum/go-ethereum/consensus/ethash"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/eth"
+	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/eth/ethconfig"
+	"github.com/ethereum/go-ethereum/miner"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 var (
@@ -441,7 +441,7 @@ func startEthService(t *testing.T, genesis *core.Genesis, blocks []*types.Block)
 	}
 
 	ethcfg := &ethconfig.Config{Genesis: genesis, Ethash: ethash.Config{PowMode: ethash.ModeFake}, SyncMode: downloader.FullSync, TrieTimeout: time.Minute, TrieDirtyCache: 256, TrieCleanCache: 256}
-	ethservice, err := eth.New(n, ethcfg,nil)
+	ethservice, err := eth.New(n, ethcfg, nil)
 	if err != nil {
 		t.Fatal("can't create eth service:", err)
 	}

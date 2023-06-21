@@ -29,17 +29,17 @@ import (
 	"time"
 
 	mapset "github.com/deckarep/golang-set/v2"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/gorilla/websocket"
-	"github.com/iswallet/go-ethereum/log"
 )
 
 const (
-	wsReadBuffer       = 3*1024
-	wsWriteBuffer      = 3*1024
+	wsReadBuffer       = 3 * 1024
+	wsWriteBuffer      = 3 * 1024
 	wsPingInterval     = 30 * time.Second
 	wsPingWriteTimeout = 5 * time.Second
 	wsPongTimeout      = 30 * time.Second
-	wsMessageSizeLimit = 10* 32 * 1024 * 1024
+	wsMessageSizeLimit = 10 * 32 * 1024 * 1024
 )
 
 var wsBufferPool = new(sync.Pool)

@@ -2,9 +2,9 @@ package trace
 
 import (
 	"encoding/json"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 )
 
 // BlockTrace contains block execution traces and results required for rollers.

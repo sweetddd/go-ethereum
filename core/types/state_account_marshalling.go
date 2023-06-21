@@ -25,7 +25,7 @@ import (
 
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/iswallet/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 var (

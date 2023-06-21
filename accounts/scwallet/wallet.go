@@ -26,7 +26,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/iswallet/go-ethereum"
+	"github.com/ethereum/go-ethereum"
 	"math/big"
 	"regexp"
 	"sort"
@@ -34,12 +34,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/log"
 	pcsc "github.com/gballet/go-libpcsclite"
-	"github.com/iswallet/go-ethereum/accounts"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/log"
 	"github.com/status-im/keycard-go/derivationpath"
 )
 

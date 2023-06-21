@@ -19,8 +19,8 @@
 package rawdb
 
 import (
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/ethdb/pebble"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/ethdb/pebble"
 )
 
 // Pebble is unsuported on 32bit architecture

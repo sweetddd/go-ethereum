@@ -23,21 +23,21 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iswallet/go-ethereum/accounts/abi"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/consensus"
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/asm"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/state"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/core/vm"
-	"github.com/iswallet/go-ethereum/eth/tracers"
-	"github.com/iswallet/go-ethereum/eth/tracers/logger"
-	"github.com/iswallet/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/asm"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/eth/tracers"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/params"
 
 	// force-load js tracers to trigger registration
-	_ "github.com/iswallet/go-ethereum/eth/tracers/js"
+	_ "github.com/ethereum/go-ethereum/eth/tracers/js"
 )
 
 func TestDefaults(t *testing.T) {

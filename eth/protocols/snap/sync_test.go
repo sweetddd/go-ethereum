@@ -27,15 +27,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/light"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/rlp"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/light"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -1391,9 +1391,9 @@ func makeAccountTrieNoStorage(n int) (string, *trie.Trie, entrySlice) {
 	)
 	for i := uint64(1); i <= uint64(n); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  big.NewInt(int64(i)),
-			Root:     types.EmptyRootHash,
+			Nonce:            i,
+			Balance:          big.NewInt(int64(i)),
+			Root:             types.EmptyRootHash,
 			KeccakCodeHash:   getKeccakCodeHash(i),
 			PoseidonCodeHash: getPoseidonCodeHash(i),
 			CodeSize:         1,
@@ -1444,9 +1444,9 @@ func makeBoundaryAccountTrie(n int) (string, *trie.Trie, entrySlice) {
 	// Fill boundary accounts
 	for i := 0; i < len(boundaries); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    uint64(0),
-			Balance:  big.NewInt(int64(i)),
-			Root:     types.EmptyRootHash,
+			Nonce:            uint64(0),
+			Balance:          big.NewInt(int64(i)),
+			Root:             types.EmptyRootHash,
 			KeccakCodeHash:   getKeccakCodeHash(uint64(i)),
 			PoseidonCodeHash: getPoseidonCodeHash(uint64(i)),
 			CodeSize:         1,
@@ -1458,9 +1458,9 @@ func makeBoundaryAccountTrie(n int) (string, *trie.Trie, entrySlice) {
 	// Fill other accounts if required
 	for i := uint64(1); i <= uint64(n); i++ {
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  big.NewInt(int64(i)),
-			Root:     types.EmptyRootHash,
+			Nonce:            i,
+			Balance:          big.NewInt(int64(i)),
+			Root:             types.EmptyRootHash,
 			KeccakCodeHash:   getKeccakCodeHash(uint64(i)),
 			PoseidonCodeHash: getPoseidonCodeHash(uint64(i)),
 			CodeSize:         1,
@@ -1506,9 +1506,9 @@ func makeAccountTrieWithStorageWithUniqueStorage(accounts, slots int, code bool)
 		nodes.Merge(stNodes)
 
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  big.NewInt(int64(i)),
-			Root:     stRoot,
+			Nonce:            i,
+			Balance:          big.NewInt(int64(i)),
+			Root:             stRoot,
 			KeccakCodeHash:   getKeccakCodeHash(uint64(i)),
 			PoseidonCodeHash: getPoseidonCodeHash(uint64(i)),
 			CodeSize:         1,
@@ -1574,9 +1574,9 @@ func makeAccountTrieWithStorage(accounts, slots int, code, boundary bool) (strin
 		nodes.Merge(stNodes)
 
 		value, _ := rlp.EncodeToBytes(&types.StateAccount{
-			Nonce:    i,
-			Balance:  big.NewInt(int64(i)),
-			Root:     stRoot,
+			Nonce:            i,
+			Balance:          big.NewInt(int64(i)),
+			Root:             stRoot,
 			KeccakCodeHash:   getKeccakCodeHash(uint64(i)),
 			PoseidonCodeHash: getPoseidonCodeHash(uint64(i)),
 			CodeSize:         1,

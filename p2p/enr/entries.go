@@ -22,7 +22,7 @@ import (
 	"io"
 	"net"
 
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // Entry is implemented by known node record entry types.

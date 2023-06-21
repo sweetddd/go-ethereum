@@ -26,10 +26,9 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/fastcache"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 // randomHash generates a random blob of data and returns it as a hash.
@@ -45,9 +44,9 @@ func randomHash() common.Hash {
 func randomAccount() []byte {
 	root := randomHash()
 	a := Account{
-		Balance:  big.NewInt(rand.Int63()),
-		Nonce:    rand.Uint64(),
-		Root:     root[:],
+		Balance:          big.NewInt(rand.Int63()),
+		Nonce:            rand.Uint64(),
+		Root:             root[:],
 		KeccakCodeHash:   emptyKeccakCode[:],
 		PoseidonCodeHash: emptyPoseidonCode[:],
 		CodeSize:         0,

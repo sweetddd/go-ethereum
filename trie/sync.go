@@ -19,15 +19,15 @@ package trie
 import (
 	"errors"
 	"fmt"
-	"github.com/iswallet/go-ethereum/crypto/codehash"
+	"github.com/ethereum/go-ethereum/crypto/codehash"
 	"sync"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/prque"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/prque"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // ErrNotRequested is returned by the trie sync when it's requested to process a

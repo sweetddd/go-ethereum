@@ -17,8 +17,8 @@
 package engine
 
 import (
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // EngineAPIError is a standardized error message between consensus and execution

@@ -3,7 +3,7 @@ package poseidon
 import (
 	"math/big"
 
-	"github.com/iswallet/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 const defaultPoseidonChunk = 3

@@ -20,12 +20,12 @@ import (
 	"math/big"
 	"sync/atomic"
 
-	"github.com/iswallet/go-ethereum/consensus"
-	"github.com/iswallet/go-ethereum/core/state"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/core/vm"
-	"github.com/iswallet/go-ethereum/params"
-	"github.com/iswallet/go-ethereum/rollup/fees"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rollup/fees"
 )
 
 // statePrefetcher is a basic Prefetcher, which blindly executes a block on top

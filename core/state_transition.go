@@ -18,16 +18,16 @@ package core
 
 import (
 	"fmt"
-	"github.com/iswallet/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/log"
 	"math"
 	"math/big"
 
-	"github.com/iswallet/go-ethereum/common"
-	cmath "github.com/iswallet/go-ethereum/common/math"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/core/vm"
-	"github.com/iswallet/go-ethereum/crypto/codehash"
-	"github.com/iswallet/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/common"
+	cmath "github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/crypto/codehash"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 var emptyKeccakCodeHash = codehash.EmptyKeccakCodeHash

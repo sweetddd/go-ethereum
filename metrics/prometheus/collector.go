@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/iswallet/go-ethereum/metrics"
+	"github.com/ethereum/go-ethereum/metrics"
 )
 
 var (

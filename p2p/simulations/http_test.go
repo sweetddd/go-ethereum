@@ -29,13 +29,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iswallet/go-ethereum/event"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/node"
-	"github.com/iswallet/go-ethereum/p2p"
-	"github.com/iswallet/go-ethereum/p2p/enode"
-	"github.com/iswallet/go-ethereum/p2p/simulations/adapters"
-	"github.com/iswallet/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/p2p"
+	"github.com/ethereum/go-ethereum/p2p/enode"
+	"github.com/ethereum/go-ethereum/p2p/simulations/adapters"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/mattn/go-colorable"
 )
 

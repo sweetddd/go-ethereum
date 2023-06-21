@@ -6,13 +6,13 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/event"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/node"
-	"github.com/iswallet/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/node"
+	"github.com/ethereum/go-ethereum/params"
 )
 
 const (

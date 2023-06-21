@@ -18,7 +18,7 @@ package trie
 
 import (
 	"bytes"
-	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	mrand "math/rand"
 	"testing"
 	"time"
@@ -27,9 +27,9 @@ import (
 
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/ethdb/memorydb"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethdb/memorydb"
 )
 
 func init() {

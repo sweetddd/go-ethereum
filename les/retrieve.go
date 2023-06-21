@@ -22,7 +22,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iswallet/go-ethereum/light"
+	"github.com/ethereum/go-ethereum/light"
 )
 
 var (

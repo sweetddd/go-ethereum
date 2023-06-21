@@ -23,19 +23,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/hexutil"
-	"github.com/iswallet/go-ethereum/consensus"
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/state"
-	"github.com/iswallet/go-ethereum/core/txpool"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/eth/downloader"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/event"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/params"
-	"github.com/iswallet/go-ethereum/rollup/sync_service"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/state"
+	"github.com/ethereum/go-ethereum/core/txpool"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/eth/downloader"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rollup/sync_service"
 )
 
 // Backend wraps all methods required for mining. Only full node is capable
@@ -45,7 +45,6 @@ type Backend interface {
 	TxPool() *txpool.TxPool
 	ChainDb() ethdb.Database
 	SyncService() *sync_service.SyncService
-
 }
 
 // Config is the configuration parameters of mining.

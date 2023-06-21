@@ -11,11 +11,11 @@ import (
 	"math/big"
 	"strings"
 
-	ethereum "github.com/iswallet/go-ethereum"
-	"github.com/iswallet/go-ethereum/accounts/abi"
-	"github.com/iswallet/go-ethereum/accounts/abi/bind"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
+	ethereum "github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 // L1MessageQueueMetaData contains all meta data concerning the L1MessageQueue contract.

@@ -23,13 +23,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/rawdb"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/ethdb"
-	"github.com/iswallet/go-ethereum/log"
-	"github.com/iswallet/go-ethereum/rlp"
-	"github.com/iswallet/go-ethereum/trie"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/trie"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -355,7 +355,7 @@ func TestGenerateExistentStateWithWrongAccounts(t *testing.T) {
 	// Extra accounts, only in the snap
 	{
 		helper.addSnapAccount("acc-0", &Account{Balance: big.NewInt(1), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                      // before the beginning
-		helper.addSnapAccount("acc-5", &Account{Balance: big.NewInt(1), Root: types.EmptyRootHash.Bytes(), CodeHash: common.Hex2Bytes("0x1234")})  // Middle
+		helper.addSnapAccount("acc-5", &Account{Balance: big.NewInt(1), Root: types.EmptyRootHash.Bytes(), CodeHash: common.Hex2Bytes("0x1234")})                                                              // Middle
 		helper.addSnapAccount("acc-7", &Account{Balance: big.NewInt(1), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}) // after the end
 	}
 
@@ -419,9 +419,9 @@ func TestGenerateMissingStorageTrie(t *testing.T) {
 	// two of which also has the same 3-slot storage trie attached.
 	helper := newHelper()
 
-	stRoot := helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-1")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true) // 0xddefcd9376dd029653ef384bd2f0a126bb755fe84fdcc9e7cf421ba454f2bc67
-	helper.addTrieAccount("acc-1", &Account{Balance: big.NewInt(1), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                                      // 0x963f96eb81a3b19322afa7044cf396f4bfba698f5887be4778086f1fa5bfe45f
-	helper.addTrieAccount("acc-2", &Account{Balance: big.NewInt(2), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                 // 0x51d00b998075e2a104a80b7280800fe8779abe0407225929ac507d8ba9e67366
+	stRoot := helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-1")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true)                                             // 0xddefcd9376dd029653ef384bd2f0a126bb755fe84fdcc9e7cf421ba454f2bc67
+	helper.addTrieAccount("acc-1", &Account{Balance: big.NewInt(1), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                      // 0x963f96eb81a3b19322afa7044cf396f4bfba698f5887be4778086f1fa5bfe45f
+	helper.addTrieAccount("acc-2", &Account{Balance: big.NewInt(2), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}) // 0x51d00b998075e2a104a80b7280800fe8779abe0407225929ac507d8ba9e67366
 	stRoot = helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-3")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true)
 	helper.addTrieAccount("acc-3", &Account{Balance: big.NewInt(3), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}) // 0x326f799ece53f1c71c1d494bf8352798d3973ecca10893ca35a96266882bc12b
 
@@ -453,9 +453,9 @@ func TestGenerateCorruptStorageTrie(t *testing.T) {
 	// two of which also has the same 3-slot storage trie attached.
 	helper := newHelper()
 
-	stRoot := helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-1")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true) // 0xddefcd9376dd029653ef384bd2f0a126bb755fe84fdcc9e7cf421ba454f2bc67
-	helper.addTrieAccount("acc-1", &Account{Balance: big.NewInt(1), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                                      // 0x963f96eb81a3b19322afa7044cf396f4bfba698f5887be4778086f1fa5bfe45f
-	helper.addTrieAccount("acc-2", &Account{Balance: big.NewInt(2), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                 // 0x51d00b998075e2a104a80b7280800fe8779abe0407225929ac507d8ba9e67366
+	stRoot := helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-1")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true)                                             // 0xddefcd9376dd029653ef384bd2f0a126bb755fe84fdcc9e7cf421ba454f2bc67
+	helper.addTrieAccount("acc-1", &Account{Balance: big.NewInt(1), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})                      // 0x963f96eb81a3b19322afa7044cf396f4bfba698f5887be4778086f1fa5bfe45f
+	helper.addTrieAccount("acc-2", &Account{Balance: big.NewInt(2), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}) // 0x51d00b998075e2a104a80b7280800fe8779abe0407225929ac507d8ba9e67366
 	stRoot = helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-3")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true)
 	helper.addTrieAccount("acc-3", &Account{Balance: big.NewInt(3), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}) // 0x326f799ece53f1c71c1d494bf8352798d3973ecca10893ca35a96266882bc12b
 
@@ -856,7 +856,7 @@ func TestGenerateBrokenSnapshotWithDanglingStorage(t *testing.T) {
 
 	helper.makeStorageTrie(common.Hash{}, hashData([]byte("acc-3")), []string{"key-1", "key-2", "key-3"}, []string{"val-1", "val-2", "val-3"}, true)
 	helper.addTrieAccount("acc-3", &Account{Balance: big.NewInt(3), Root: stRoot, KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0})
-		acc := &Account{Balance: big.NewInt(1), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}
+	acc := &Account{Balance: big.NewInt(1), Root: types.EmptyRootHash.Bytes(), KeccakCodeHash: emptyKeccakCode.Bytes(), PoseidonCodeHash: emptyPoseidonCode.Bytes(), CodeSize: 0}
 
 	populateDangling(helper.diskdb)
 

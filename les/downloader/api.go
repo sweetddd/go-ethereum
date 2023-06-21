@@ -18,11 +18,11 @@ package downloader
 
 import (
 	"context"
-	"github.com/iswallet/go-ethereum"
+	"github.com/ethereum/go-ethereum"
 	"sync"
 
-	"github.com/iswallet/go-ethereum/event"
-	"github.com/iswallet/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/event"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // DownloaderAPI provides an API which gives information about the current synchronisation status.

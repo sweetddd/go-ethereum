@@ -5,7 +5,7 @@
 
 package types
 
-import "github.com/iswallet/go-ethereum/rlp"
+import "github.com/ethereum/go-ethereum/rlp"
 import "io"
 
 func (obj *StateAccount) EncodeRLP(_w io.Writer) error {

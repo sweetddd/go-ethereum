@@ -24,7 +24,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/iswallet/go-ethereum/log"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 const MetadataApi = "rpc"
@@ -47,11 +47,11 @@ const (
 type Server struct {
 	services serviceRegistry
 	idgen    func() ID
-	mutex  sync.Mutex
-	codecs map[ServerCodec]struct{}
+	mutex    sync.Mutex
+	codecs   map[ServerCodec]struct{}
 	// Add compressionLevel inorder to enable set it when open websocket server.
 	compressionLevel int
-	run    int32
+	run              int32
 }
 
 // NewServer creates a new server instance with no registered handlers.

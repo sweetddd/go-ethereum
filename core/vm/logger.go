@@ -17,7 +17,7 @@
 package vm
 
 import (
-	"github.com/iswallet/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 	"math/big"
 )
 

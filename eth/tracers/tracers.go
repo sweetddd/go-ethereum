@@ -21,8 +21,8 @@ import (
 	"encoding/json"
 	"math/big"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/vm"
 )
 
 // Context contains some contextual infos for a transaction execution that is not

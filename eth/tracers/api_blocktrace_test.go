@@ -3,20 +3,20 @@ package tracers
 import (
 	"context"
 	"encoding/json"
-	"github.com/iswallet/go-ethereum/core/types/trace"
-	"github.com/iswallet/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/core/types/trace"
+	"github.com/ethereum/go-ethereum/eth/tracers/logger"
 	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/iswallet/go-ethereum/accounts/abi/bind"
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/common/hexutil"
-	"github.com/iswallet/go-ethereum/core"
-	"github.com/iswallet/go-ethereum/core/types"
-	"github.com/iswallet/go-ethereum/params"
-	"github.com/iswallet/go-ethereum/rpc"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/params"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // erc20MetaData contains all meta data concerning the ERC20 contract.

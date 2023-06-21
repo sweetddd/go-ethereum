@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/rollup/rcfg"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rollup/rcfg"
 	"golang.org/x/crypto/sha3"
 )
 

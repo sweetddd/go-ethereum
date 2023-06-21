@@ -23,9 +23,9 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/iswallet/go-ethereum/crypto"
-	"github.com/iswallet/go-ethereum/p2p/enr"
-	"github.com/iswallet/go-ethereum/rlp"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/p2p/enr"
+	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

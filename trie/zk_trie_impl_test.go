@@ -1,7 +1,7 @@
 package trie
 
 import (
-	"github.com/iswallet/go-ethereum/core/rawdb"
+	"github.com/ethereum/go-ethereum/core/rawdb"
 	"math/big"
 	"testing"
 
@@ -13,8 +13,8 @@ import (
 	zktrie "github.com/scroll-tech/zktrie/trie"
 	zkt "github.com/scroll-tech/zktrie/types"
 
-	"github.com/iswallet/go-ethereum/common"
-	"github.com/iswallet/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 // we do not need zktrie impl anymore, only made a wrapper for adapting testing
