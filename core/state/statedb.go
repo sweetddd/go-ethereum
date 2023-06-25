@@ -616,11 +616,13 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 	if data == nil {
 		start := time.Now()
 		var err error
+
+		//enc, err := s.trie.TryGet(addr.Bytes())
+
 		data, err = s.trie.TryGetAccount(addr)
 		if metrics.EnabledExpensive {
 			s.AccountReads += time.Since(start)
 		}
-		enc, err := s.trie.TryGet(addr.Bytes())
 		if err != nil {
 			s.setError(fmt.Errorf("getDeleteStateObject (%x) error: %w", addr.Bytes(), err))
 			return nil
@@ -628,16 +630,16 @@ func (s *StateDB) getDeletedStateObject(addr common.Address) *stateObject {
 		if data == nil {
 			return nil
 		}
-		if s.IsZktrie() {
-			data, err = types.UnmarshalStateAccount(enc)
-		} else {
-			data = new(types.StateAccount)
-			err = rlp.DecodeBytes(enc, data)
-		}
-		if err != nil {
-			log.Error("Failed to decode state object", "addr", addr, "err", err)
-			return nil
-		}
+		//if s.IsZktrie() {
+		//	data, err = types.UnmarshalStateAccount(enc)
+		//} else {
+		//	data = new(types.StateAccount)
+		//	err = rlp.DecodeBytes(enc, data)
+		//}
+		//if err != nil {
+		//	log.Error("Failed to decode state object", "addr", addr, "err", err)
+		//	return nil
+		//}
 
 	}
 	// Insert into the live set

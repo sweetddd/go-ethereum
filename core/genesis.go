@@ -131,9 +131,6 @@ func (ga *GenesisAlloc) deriveHash(config *params.ChainConfig) (common.Hash, err
 		panic(err)
 	}
 
-	if err != nil {
-		return common.Hash{}, err
-	}
 	for addr, account := range *ga {
 		statedb.AddBalance(addr, account.Balance)
 		statedb.SetCode(addr, account.Code)
@@ -341,6 +338,7 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	//	trieCfg = &trie.Config{Zktrie: genesis.Config.Scroll.ZktrieEnabled()}
 	//}
 
+	log.Info("header.Root", header.Root)
 	if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
 		if genesis == nil {
 			genesis = DefaultGenesisBlock()
