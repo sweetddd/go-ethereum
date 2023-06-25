@@ -146,8 +146,9 @@ func NewDatabaseWithConfig(db ethdb.Database, config *trie.Config) Database {
 }
 
 // NewDatabaseWithNodeDB creates a state database with an already initialized node database.
-func NewDatabaseWithNodeDB(db ethdb.Database, triedb *trie.Database) Database {
+func NewDatabaseWithNodeDB(db ethdb.Database, triedb *trie.Database, zktrie bool) Database {
 	return &cachingDB{
+		zktrie:        zktrie,
 		disk:          db,
 		codeSizeCache: lru.NewCache[common.Hash, int](codeSizeCacheSize),
 		codeCache:     lru.NewSizeConstrainedCache[common.Hash, []byte](codeCacheSize),

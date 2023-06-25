@@ -145,8 +145,8 @@ func (ga *GenesisAlloc) deriveHash(config *params.ChainConfig) (common.Hash, err
 // flush is very similar with deriveHash, but the main difference is
 // all the generated states will be persisted into the given database.
 // Also, the genesis state specification will be flushed as well.
-func (ga *GenesisAlloc) flush(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
-	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithNodeDB(db, triedb), nil)
+func (ga *GenesisAlloc) flush(db ethdb.Database, triedb *trie.Database, blockhash common.Hash, zktrie bool) error {
+	statedb, err := state.New(common.Hash{}, state.NewDatabaseWithNodeDB(db, triedb, zktrie), nil)
 	if err != nil {
 		return err
 	}
@@ -179,7 +179,7 @@ func (ga *GenesisAlloc) flush(db ethdb.Database, triedb *trie.Database, blockhas
 
 // CommitGenesisState loads the stored genesis state with the given block
 // hash and commits it into the provided trie database.
-func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash) error {
+func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash common.Hash, zktrie bool) error {
 	var alloc GenesisAlloc
 	blob := rawdb.ReadGenesisStateSpec(db, blockhash)
 	if len(blob) != 0 {
@@ -209,7 +209,7 @@ func CommitGenesisState(db ethdb.Database, triedb *trie.Database, blockhash comm
 			return errors.New("not found")
 		}
 	}
-	return alloc.flush(db, triedb, blockhash)
+	return alloc.flush(db, triedb, blockhash, zktrie)
 }
 
 // GenesisAccount is an account in the state of the genesis block.
@@ -325,21 +325,24 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	// but the corresponding state is missing.
 	header := rawdb.ReadHeader(db, stored, 0)
 
-	//var trieCfg *trie.Config
-	//
-	//if genesis == nil {
-	//	storedcfg := rawdb.ReadChainConfig(db, stored)
-	//	if storedcfg == nil {
-	//		log.Warn("Found genesis block without chain config")
-	//	} else {
-	//		trieCfg = &trie.Config{Zktrie: storedcfg.Scroll.ZktrieEnabled()}
-	//	}
-	//} else {
-	//	trieCfg = &trie.Config{Zktrie: genesis.Config.Scroll.ZktrieEnabled()}
-	//}
+	var trieCfg *trie.Config
 
-	log.Info("header.Root", header.Root)
-	if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
+	if genesis == nil {
+		storedcfg := rawdb.ReadChainConfig(db, stored)
+		if storedcfg == nil {
+			log.Warn("Found genesis block without chain config")
+		} else {
+			trieCfg = &trie.Config{Zktrie: storedcfg.Scroll.ZktrieEnabled()}
+		}
+	} else {
+		trieCfg = &trie.Config{Zktrie: genesis.Config.Scroll.ZktrieEnabled()}
+	}
+
+	fmt.Printf("header.Root %x \n", header.Root)
+	//if header.Root != types.EmptyRootHash && !rawdb.HasLegacyTrieNode(db, header.Root) {
+
+	if _, err := state.New(header.Root, state.NewDatabaseWithConfig(db, trieCfg), nil); err != nil {
+
 		if genesis == nil {
 			genesis = DefaultGenesisBlock()
 		}
@@ -518,7 +521,7 @@ func (g *Genesis) Commit(db ethdb.Database, triedb *trie.Database) (*types.Block
 	// All the checks has passed, flush the states derived from the genesis
 	// specification as well as the specification itself into the provided
 	// database.
-	if err := g.Alloc.flush(db, triedb, block.Hash()); err != nil {
+	if err := g.Alloc.flush(db, triedb, block.Hash(), g.Config.Scroll.UseZktrie); err != nil {
 		return nil, err
 	}
 	rawdb.WriteTd(db, block.Hash(), block.NumberU64(), block.Difficulty())

@@ -294,7 +294,7 @@ func NewBlockChain(db ethdb.Database, cacheConfig *CacheConfig, genesis *Genesis
 		vmConfig:      vmConfig,
 	}
 	bc.forker = NewForkChoice(bc, shouldPreserve)
-	bc.stateCache = state.NewDatabaseWithNodeDB(bc.db, bc.triedb)
+	bc.stateCache = state.NewDatabaseWithNodeDB(bc.db, bc.triedb, chainConfig.Scroll.ZktrieEnabled())
 	bc.validator = NewBlockValidator(chainConfig, bc, engine)
 	bc.prefetcher = newStatePrefetcher(chainConfig, bc, engine)
 	bc.processor = NewStateProcessor(chainConfig, bc, engine)
@@ -691,7 +691,7 @@ func (bc *BlockChain) setHeadBeyondRoot(head uint64, time uint64, root common.Ha
 							// if the historical chain pruning is enabled. In that case the logic
 							// needs to be improved here.
 							if !bc.HasState(bc.genesisBlock.Root()) {
-								if err := CommitGenesisState(bc.db, bc.triedb, bc.genesisBlock.Hash()); err != nil {
+								if err := CommitGenesisState(bc.db, bc.triedb, bc.genesisBlock.Hash(), bc.chainConfig.Scroll.UseZktrie); err != nil {
 									log.Crit("Failed to commit genesis state", "err", err)
 								}
 								log.Debug("Recommitted genesis state to disk")
